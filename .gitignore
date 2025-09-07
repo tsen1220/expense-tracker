@@ -44,6 +44,15 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Build artifacts and distribution files
+artifacts/
+*.apk
+*.ipa
+*.aab
+/build/ios/archive/
+/build/ios/ipa/
+/build/app/outputs/
+
 # AI assistant files
 claude.md
 gemini.md

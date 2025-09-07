@@ -1,0 +1,617 @@
+{
+  "@@locale": "en",
+  "appTitle": "Expense Tracker",
+  "@@appTitle": {
+    "description": "Title of the application"
+  },
+  "home": "Home",
+  "@@home": {
+    "description": "Home screen navigation label"
+  },
+  "income": "Income",
+  "@@income": {
+    "description": "Income label"
+  },
+  "expense": "Expense",
+  "@@expense": {
+    "description": "Expense label"
+  },
+  "total": "Total",
+  "@@total": {
+    "description": "Total amount label"
+  },
+  "thisMonth": "This Month",
+  "@@thisMonth": {
+    "description": "Current month filter label"
+  },
+  "addTransaction": "Add Transaction",
+  "@@addTransaction": {
+    "description": "Add transaction button label"
+  },
+  "addIncome": "Add Income",
+  "@@addIncome": {
+    "description": "Add income screen title"
+  },
+  "addExpense": "Add Expense",
+  "@@addExpense": {
+    "description": "Add expense screen title"
+  },
+  "title": "Title",
+  "@@title": {
+    "description": "Transaction title field label"
+  },
+  "amount": "Amount",
+  "@@amount": {
+    "description": "Transaction amount field label"
+  },
+  "category": "Category",
+  "@@category": {
+    "description": "Category field label"
+  },
+  "description": "Description",
+  "@@description": {
+    "description": "Transaction description field label"
+  },
+  "date": "Date",
+  "@@date": {
+    "description": "Date field label"
+  },
+  "save": "Save",
+  "@@save": {
+    "description": "Save button label"
+  },
+  "cancel": "Cancel",
+  "@@cancel": {
+    "description": "Cancel button label"
+  },
+  "edit": "Edit",
+  "@@edit": {
+    "description": "Edit action label"
+  },
+  "delete": "Delete",
+  "@@delete": {
+    "description": "Delete action label"
+  },
+  "categories": "Categories",
+  "@@categories": {
+    "description": "Categories screen title"
+  },
+  "addCategory": "Add Category",
+  "@@addCategory": {
+    "description": "Add category screen title"
+  },
+  "editCategory": "Edit Category",
+  "@@editCategory": {
+    "description": "Edit category screen title"
+  },
+  "categoryName": "Category Name",
+  "@@categoryName": {
+    "description": "Category name field label"
+  },
+  "selectIcon": "Select Icon",
+  "@@selectIcon": {
+    "description": "Select icon button label"
+  },
+  "selectColor": "Select Color",
+  "@@selectColor": {
+    "description": "Select color button label"
+  },
+  "export": "Export",
+  "@@export": {
+    "description": "Export screen title"
+  },
+  "import": "Import",
+  "@@import": {
+    "description": "Import screen title"
+  },
+  "selectDateRange": "Select Date Range",
+  "@@selectDateRange": {
+    "description": "Date range selection label"
+  },
+  "startDate": "Start Date",
+  "@@startDate": {
+    "description": "Start date field label"
+  },
+  "endDate": "End Date",
+  "@@endDate": {
+    "description": "End date field label"
+  },
+  "exportData": "Export Data",
+  "@@exportData": {
+    "description": "Export data button label"
+  },
+  "importData": "Import Data",
+  "@@importData": {
+    "description": "Import data button label"
+  },
+  "selectFile": "Select File",
+  "@@selectFile": {
+    "description": "Select file button label"
+  },
+  "settings": "Settings",
+  "@@settings": {
+    "description": "Settings screen title"
+  },
+  "theme": "Theme",
+  "@@theme": {
+    "description": "Theme setting label"
+  },
+  "language": "Language",
+  "@@language": {
+    "description": "Language setting label"
+  },
+  "light": "Light",
+  "@@light": {
+    "description": "Light theme option"
+  },
+  "dark": "Dark",
+  "@@dark": {
+    "description": "Dark theme option"
+  },
+  "system": "System",
+  "@@system": {
+    "description": "System theme option"
+  },
+  "english": "English",
+  "@@english": {
+    "description": "English language option"
+  },
+  "traditionalChinese": "繁體中文",
+  "@@traditionalChinese": {
+    "description": "Traditional Chinese language option"
+  },
+  "pleaseEnterTitle": "Please enter a title",
+  "@@pleaseEnterTitle": {
+    "description": "Validation message for empty title"
+  },
+  "pleaseEnterAmount": "Please enter an amount",
+  "@@pleaseEnterAmount": {
+    "description": "Validation message for empty amount"
+  },
+  "pleaseEnterValidAmount": "Please enter a valid amount",
+  "@@pleaseEnterValidAmount": {
+    "description": "Validation message for invalid amount"
+  },
+  "pleaseSelectCategory": "Please select a category",
+  "@@pleaseSelectCategory": {
+    "description": "Validation message for no category selected"
+  },
+  "food": "Food",
+  "clothing": "Clothing",
+  "housing": "Housing",
+  "transportation": "Transportation",
+  "education": "Education",
+  "entertainment": "Entertainment",
+  "salary": "Salary",
+  "business": "Business",
+  "investment": "Investment",
+  "gift": "Gift",
+  "other": "Other",
+  "noExpensesYet": "No expenses yet",
+  "@@noExpensesYet": {
+    "description": "Empty state message for expenses"
+  },
+  "noIncomeYet": "No income yet",
+  "@@noIncomeYet": {
+    "description": "Empty state message for income"
+  },
+  "tapPlusToStart": "Tap the + button to start tracking",
+  "@@tapPlusToStart": {
+    "description": "Instructions for adding first transaction"
+  },
+  "net": "Net",
+  "@@net": {
+    "description": "Net balance label"
+  },
+  "manageCategories": "Manage Categories",
+  "@@manageCategories": {
+    "description": "Manage categories menu item"
+  },
+  "iconColor": "Icon & Color",
+  "@@iconColor": {
+    "description": "Icon and color selection section"
+  },
+  "deleteConfirmTitle": "Delete Transaction",
+  "@@deleteConfirmTitle": {
+    "description": "Delete confirmation dialog title"
+  },
+  "deleteConfirmMessage": "Are you sure you want to delete \"{title}\"?",
+  "@deleteConfirmMessage": {
+    "description": "Delete confirmation dialog message",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteCategoryMessage": "Are you sure you want to delete the \"{categoryName}\" category?",
+  "@deleteCategoryMessage": {
+    "description": "Delete category confirmation message",
+    "placeholders": {
+      "categoryName": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryDeletedSuccess": "Category deleted successfully",
+  "@@categoryDeletedSuccess": {
+    "description": "Success message when category is deleted"
+  },
+  "failedToDeleteCategory": "Failed to delete category: {error}",
+  "@failedToDeleteCategory": {
+    "description": "Error message when category deletion fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noCategoriesYet": "No categories yet",
+  "@@noCategoriesYet": {
+    "description": "Empty state message for categories"
+  },
+  "update": "Update",
+  "@@update": {
+    "description": "Update button text"
+  },
+  "displayName": "Display Name",
+  "@@displayName": {
+    "description": "Display name field label"
+  },
+  "importInstructions": "Import Instructions",
+  "@@importInstructions": {
+    "description": "Import instructions section title"
+  },
+  "selectCSVFormat": "Select a CSV file with the following format:",
+  "@@selectCSVFormat": {
+    "description": "CSV format instructions"
+  },
+  "dateFormat": "Date: yyyy-MM-dd format (e.g., 2024-01-15)",
+  "@@dateFormat": {
+    "description": "Date format requirement"
+  },
+  "titleFormat": "Title: Transaction description",
+  "@@titleFormat": {
+    "description": "Title format requirement"
+  },
+  "amountFormat": "Amount: Positive number (e.g., 85.50)",
+  "@@amountFormat": {
+    "description": "Amount format requirement"
+  },
+  "typeFormat": "Type: INCOME or EXPENSE",
+  "@@typeFormat": {
+    "description": "Type format requirement"
+  },
+  "categoryFormat": "Category: Must match existing category name",
+  "@@categoryFormat": {
+    "description": "Category format requirement"
+  },
+  "descriptionFormat": "Description: Optional details",
+  "@@descriptionFormat": {
+    "description": "Description format requirement"
+  },
+  "importNote": "Note: All valid transactions will be imported. Please ensure your CSV data is accurate.",
+  "@@importNote": {
+    "description": "Import safety note"
+  },
+  "sampleCSVFormat": "Sample CSV Format",
+  "@@sampleCSVFormat": {
+    "description": "Sample CSV section title"
+  },
+  "copy": "Copy",
+  "@@copy": {
+    "description": "Copy button text"
+  },
+  "selectCSVFile": "Select CSV File",
+  "@@selectCSVFile": {
+    "description": "Select CSV file button text"
+  },
+  "importing": "Importing...",
+  "@@importing": {
+    "description": "Importing progress text"
+  },
+  "importResult": "Import Result",
+  "@@importResult": {
+    "description": "Import result section title"
+  },
+  "successfullyImported": "Successfully imported",
+  "@@successfullyImported": {
+    "description": "Successfully imported label"
+  },
+  "transactions": "transactions",
+  "@@transactions": {
+    "description": "Transactions unit text"
+  },
+  "errorsEncountered": "Errors encountered",
+  "@@errorsEncountered": {
+    "description": "Errors encountered label"
+  },
+  "rows": "rows",
+  "@@rows": {
+    "description": "Rows unit text"
+  },
+  "errors": "Errors:",
+  "@@errors": {
+    "description": "Errors section title"
+  },
+  "done": "Done",
+  "@@done": {
+    "description": "Done button text"
+  },
+  "importSuccessMessage": "Successfully imported {count} transactions",
+  "@importSuccessMessage": {
+    "description": "Import success message",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importFailedMessage": "Import failed with {count} errors",
+  "@importFailedMessage": {
+    "description": "Import failed message",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importFailedWithError": "Import failed: {error}",
+  "@importFailedWithError": {
+    "description": "Import failed with error message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "sampleCSVCopied": "Sample CSV copied to clipboard",
+  "@@sampleCSVCopied": {
+    "description": "Sample CSV copied confirmation message"
+  },
+  "exportSummary": "Export Summary",
+  "@@exportSummary": {
+    "description": "Export summary section title"
+  },
+  "period": "Period",
+  "@@period": {
+    "description": "Time period label"
+  },
+  "totalTransactions": "Total Transactions",
+  "@@totalTransactions": {
+    "description": "Total transactions label"
+  },
+  "totalIncome": "Total Income",
+  "@@totalIncome": {
+    "description": "Total income label"
+  },
+  "totalExpenses": "Total Expenses",
+  "@@totalExpenses": {
+    "description": "Total expenses label"
+  },
+  "netBalance": "Net Balance",
+  "@@netBalance": {
+    "description": "Net balance label"
+  },
+  "selectDateRangeToSee": "Select date range to see summary",
+  "@@selectDateRangeToSee": {
+    "description": "Instruction to select date range"
+  },
+  "selectStartDate": "Select start date",
+  "@@selectStartDate": {
+    "description": "Start date placeholder text"
+  },
+  "selectEndDate": "Select end date",
+  "@@selectEndDate": {
+    "description": "End date placeholder text"
+  },
+  "exporting": "Exporting...",
+  "@@exporting": {
+    "description": "Exporting progress text"
+  },
+  "exportAndShareCSV": "Export and Share CSV",
+  "@@exportAndShareCSV": {
+    "description": "Export and share button text"
+  },
+  "errorLoadingSummary": "Error loading summary: {error}",
+  "@errorLoadingSummary": {
+    "description": "Error loading summary message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseSelectDates": "Please select start and end dates",
+  "@@pleaseSelectDates": {
+    "description": "Validation message for missing dates"
+  },
+  "endDateAfterStart": "End date must be after start date",
+  "@@endDateAfterStart": {
+    "description": "Validation message for invalid date range"
+  },
+  "csvExportedSuccessfully": "CSV exported and shared successfully!",
+  "@@csvExportedSuccessfully": {
+    "description": "Success message for CSV export"
+  },
+  "exportFailed": "Export failed: {error}",
+  "@exportFailed": {
+    "description": "Export failed error message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noTransactionsFound": "No transactions found for selected date range",
+  "@@noTransactionsFound": {
+    "description": "No transactions found message"
+  },
+  "exportContent": "Export Content",
+  "@@exportContent": {
+    "description": "Export content dialog title"
+  },
+  "failedToShareFile": "Failed to share file: {error}",
+  "@failedToShareFile": {
+    "description": "Failed to share file message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "csvContent": "CSV content:",
+  "@@csvContent": {
+    "description": "CSV content label"
+  },
+  "close": "Close",
+  "@@close": {
+    "description": "Close button text"
+  },
+  "expenseTrackerExport": "Expense Tracker Export - {fileName}",
+  "@expenseTrackerExport": {
+    "description": "Export sharing text",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "financialDataExport": "Financial Data Export",
+  "@@financialDataExport": {
+    "description": "Export sharing subject"
+  },
+  "editTransaction": "Edit Transaction",
+  "@@editTransaction": {
+    "description": "Edit transaction screen title"
+  },
+  "expenseTransaction": "Expense Transaction",
+  "@@expenseTransaction": {
+    "description": "Expense transaction type label"
+  },
+  "incomeTransaction": "Income Transaction",
+  "@@incomeTransaction": {
+    "description": "Income transaction type label"
+  },
+  "titleHint": "e.g., Lunch at restaurant",
+  "@@titleHint": {
+    "description": "Title field hint text"
+  },
+  "amountHint": "0.00",
+  "@@amountHint": {
+    "description": "Amount field hint text"
+  },
+  "selectCategory": "Select a category",
+  "@@selectCategory": {
+    "description": "Category dropdown hint text"
+  },
+  "descriptionOptional": "Description (Optional)",
+  "@@descriptionOptional": {
+    "description": "Description field label"
+  },
+  "addNotesHint": "Add notes about this transaction",
+  "@@addNotesHint": {
+    "description": "Description field hint text"
+  },
+  "preview": "Preview",
+  "@@preview": {
+    "description": "Preview section title"
+  },
+  "transactionTitle": "Transaction Title",
+  "@@transactionTitle": {
+    "description": "Default transaction title in preview"
+  },
+  "errorLoadingCategories": "Error loading categories: {error}",
+  "@errorLoadingCategories": {
+    "description": "Error loading categories message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorSavingTransaction": "Error saving transaction: {error}",
+  "@errorSavingTransaction": {
+    "description": "Error saving transaction message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "incomeCategory": "Income Category",
+  "@@incomeCategory": {
+    "description": "Income category label"
+  },
+  "expenseCategory": "Expense Category",
+  "@@expenseCategory": {
+    "description": "Expense category label"
+  },
+  "displayNameHint": "e.g., Food & Dining",
+  "@@displayNameHint": {
+    "description": "Display name field hint text"
+  },
+  "pleaseEnterDisplayName": "Please enter a display name",
+  "@@pleaseEnterDisplayName": {
+    "description": "Validation message for empty display name"
+  },
+  "internalName": "Internal Name",
+  "@@internalName": {
+    "description": "Internal name field label"
+  },
+  "internalNameHint": "e.g., food_dining",
+  "@@internalNameHint": {
+    "description": "Internal name field hint text"
+  },
+  "internalNameHelper": "Used internally, will be auto-generated if empty",
+  "@@internalNameHelper": {
+    "description": "Internal name field helper text"
+  },
+  "icon": "Icon",
+  "@@icon": {
+    "description": "Icon selection label"
+  },
+  "tapToChange": "Tap to change",
+  "@@tapToChange": {
+    "description": "Tap to change instruction text"
+  },
+  "color": "Color",
+  "@@color": {
+    "description": "Color selection label"
+  },
+  "errorSavingCategory": "Error saving category: {error}",
+  "@errorSavingCategory": {
+    "description": "Error saving category message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "defaultCategory": "Default Category",
+  "@@defaultCategory": {
+    "description": "Default category label"
+  },
+  "customCategory": "Custom Category",
+  "@@customCategory": {
+    "description": "Custom category label"
+  },
+  "deleteConfirmCategory": "Are you sure you want to delete \"{categoryName}\"?",
+  "@deleteConfirmCategory": {
+    "description": "Delete category confirmation message",
+    "placeholders": {
+      "categoryName": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToDeleteCategoryError": "Failed to delete category: {error}",
+  "@failedToDeleteCategoryError": {
+    "description": "Failed to delete category error message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
+}

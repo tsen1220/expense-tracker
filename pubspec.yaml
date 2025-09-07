@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -37,13 +39,23 @@ dependencies:
   
   # Database
   sqflite: ^2.3.0
+  sqflite_common_ffi: ^2.3.0
   path: ^1.8.3
   
   # Charts
   fl_chart: ^0.66.0
   
   # UI and utilities
-  intl: ^0.19.0
+  intl: ^0.20.2
+
+  # State management
+  provider: ^6.1.2
+
+  # CSV export and sharing
+  csv: ^6.0.0
+  share_plus: ^10.1.2
+  path_provider: ^2.1.4
+  file_picker: ^8.1.4
 
 dev_dependencies:
   flutter_test:
@@ -55,15 +67,16 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  
-  # Testing with SQLite
-  sqflite_common_ffi: ^2.3.0
+
+  # App icon generator (only needed during development)
+  # flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -100,3 +113,19 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  windows:
+    generate: true
+    image_path: "app_icon.png"
+  macos:
+    generate: true
+    image_path: "app_icon.png"
+  linux:
+    generate: true
+    image_path: "app_icon.png"
+  image_path: "app_icon.png"
+  adaptive_icon_background: "#FF8A50"
+  adaptive_icon_foreground: "app_icon.png"
