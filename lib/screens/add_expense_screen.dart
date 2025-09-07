@@ -16,7 +16,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   ExpenseCategory _selectedCategory = ExpenseCategory.food;
   DateTime _selectedDate = DateTime.now();
 
@@ -42,20 +42,20 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     }
   }
 
-  void _saveExpense() async {
+  Future<void> _saveExpense() async {
     if (_formKey.currentState!.validate()) {
       final expense = Expense(
         title: _titleController.text,
         amount: double.parse(_amountController.text),
         category: _selectedCategory,
         date: _selectedDate,
-        description: _descriptionController.text.isEmpty 
-            ? null 
+        description: _descriptionController.text.isEmpty
+            ? null
             : _descriptionController.text,
       );
 
       await DatabaseHelper.instance.insertExpense(expense);
-      
+
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -71,10 +71,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       appBar: AppBar(
         title: const Text('Add Expense'),
         actions: [
-          TextButton(
-            onPressed: _saveExpense,
-            child: const Text('Save'),
-          ),
+          TextButton(onPressed: _saveExpense, child: const Text('Add')),
         ],
       ),
       body: Form(
@@ -146,7 +143,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               const SizedBox(height: 16),
               ListTile(
                 leading: const Icon(Icons.calendar_today),
-                title: Text('Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}'),
+                title: Text(
+                  'Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}',
+                ),
                 onTap: () => _selectDate(context),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
