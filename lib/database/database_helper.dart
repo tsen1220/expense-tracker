@@ -66,7 +66,10 @@ class DatabaseHelper {
     return List.generate(maps.length, (i) => Expense.fromMap(maps[i]));
   }
 
-  Future<List<Expense>> getExpensesByDateRange(DateTime start, DateTime end) async {
+  Future<List<Expense>> getExpensesByDateRange(
+    DateTime start,
+    DateTime end,
+  ) async {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.query(
       _tableName,
@@ -80,7 +83,7 @@ class DatabaseHelper {
   Future<Map<ExpenseCategory, double>> getCategoryTotals() async {
     Database db = await database;
     Map<ExpenseCategory, double> totals = {};
-    
+
     for (ExpenseCategory category in ExpenseCategory.values) {
       List<Map<String, dynamic>> result = await db.rawQuery(
         'SELECT SUM(amount) as total FROM $_tableName WHERE category = ?',
@@ -91,7 +94,7 @@ class DatabaseHelper {
         totals[category] = total;
       }
     }
-    
+
     return totals;
   }
 
@@ -107,17 +110,97 @@ class DatabaseHelper {
 
   Future<int> deleteExpense(int id) async {
     Database db = await database;
-    return await db.delete(
-      _tableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete(_tableName, where: 'id = ?', whereArgs: [id]);
   }
 
   Future<double> getTotalExpenses() async {
     Database db = await database;
     List<Map<String, dynamic>> result = await db.rawQuery(
       'SELECT SUM(amount) as total FROM $_tableName',
+    );
+    return result[0]['total'] ?? 0.0;
+  }
+
+  Future<List<Expense>> getExpensesByMonth(int year, int month) async {
+    Database db = await database;
+
+    // 計算該月份的開始和結束時間 (毫秒)
+    final startOfMonth = DateTime(year, month, 1).millisecondsSinceEpoch;
+    final endOfMonth = DateTime(
+      year,
+      month + 1,
+      1,
+    ).subtract(const Duration(days: 1)).millisecondsSinceEpoch;
+
+    List<Map<String, dynamic>> maps = await db.query(
+      _tableName,
+      where: 'date >= ? AND date <= ?',
+      whereArgs: [startOfMonth, endOfMonth],
+      orderBy: 'date DESC',
+    );
+    return List.generate(maps.length, (i) => Expense.fromMap(maps[i]));
+  }
+
+  Future<List<Expense>> getExpensesByMonthPaginated(
+    int year,
+    int month,
+    int page,
+    int pageSize,
+  ) async {
+    Database db = await database;
+
+    // 計算該月份的開始和結束時間 (毫秒)
+    final startOfMonth = DateTime(year, month, 1).millisecondsSinceEpoch;
+    final endOfMonth = DateTime(
+      year,
+      month + 1,
+      1,
+    ).subtract(const Duration(days: 1)).millisecondsSinceEpoch;
+
+    final offset = page * pageSize;
+
+    List<Map<String, dynamic>> maps = await db.query(
+      _tableName,
+      where: 'date >= ? AND date <= ?',
+      whereArgs: [startOfMonth, endOfMonth],
+      orderBy: 'date DESC',
+      limit: pageSize,
+      offset: offset,
+    );
+    return List.generate(maps.length, (i) => Expense.fromMap(maps[i]));
+  }
+
+  Future<int> getExpensesCountByMonth(int year, int month) async {
+    Database db = await database;
+
+    // 計算該月份的開始和結束時間 (毫秒)
+    final startOfMonth = DateTime(year, month, 1).millisecondsSinceEpoch;
+    final endOfMonth = DateTime(
+      year,
+      month + 1,
+      1,
+    ).subtract(const Duration(days: 1)).millisecondsSinceEpoch;
+
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM $_tableName WHERE date >= ? AND date <= ?',
+      [startOfMonth, endOfMonth],
+    );
+    return result[0]['count'] ?? 0;
+  }
+
+  Future<double> getTotalExpensesByMonth(int year, int month) async {
+    Database db = await database;
+
+    final startOfMonth = DateTime(year, month, 1).millisecondsSinceEpoch;
+    final endOfMonth = DateTime(
+      year,
+      month + 1,
+      1,
+    ).subtract(const Duration(days: 1)).millisecondsSinceEpoch;
+
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM $_tableName WHERE date >= ? AND date <= ?',
+      [startOfMonth, endOfMonth],
     );
     return result[0]['total'] ?? 0.0;
   }

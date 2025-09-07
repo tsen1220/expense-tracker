@@ -44,23 +44,31 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   Future<void> _saveExpense() async {
     if (_formKey.currentState!.validate()) {
-      final expense = Expense(
-        title: _titleController.text,
-        amount: double.parse(_amountController.text),
-        category: _selectedCategory,
-        date: _selectedDate,
-        description: _descriptionController.text.isEmpty
-            ? null
-            : _descriptionController.text,
-      );
-
-      await DatabaseHelper.instance.insertExpense(expense);
-
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Expense added successfully')),
+      try {
+        final expense = Expense(
+          title: _titleController.text,
+          amount: double.parse(_amountController.text),
+          category: _selectedCategory,
+          date: _selectedDate,
+          description: _descriptionController.text.isEmpty
+              ? null
+              : _descriptionController.text,
         );
+
+        await DatabaseHelper.instance.insertExpense(expense);
+
+        if (mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Expense added successfully')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error saving expense: $e')));
+        }
       }
     }
   }

@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  // Initialize sqflite for different platforms
-  if (kIsWeb) {
-    // Web platform
-    databaseFactory = databaseFactoryFfiWeb;
-  } else if (defaultTargetPlatform == TargetPlatform.windows || 
-             defaultTargetPlatform == TargetPlatform.linux || 
-             defaultTargetPlatform == TargetPlatform.macOS) {
+  // Initialize sqflite for desktop platforms only
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux ||
+          defaultTargetPlatform == TargetPlatform.macOS)) {
     // Desktop platforms
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
-  
+
+  // Mobile platforms (iOS/Android) use default SQLite
+
   runApp(const ExpenseTrackerApp());
 }
 
