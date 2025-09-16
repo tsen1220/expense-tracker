@@ -33,7 +33,7 @@ class Category {
 
   factory Category.fromMap(Map<String, dynamic> map) {
     return Category(
-      id: map['id'],
+      id: map['category_table_id'] ?? map['id'], // Support both aliases
       name: map['name'],
       displayName: map['display_name'],
       icon: IconData(map['icon_code'], fontFamily: 'MaterialIcons'),

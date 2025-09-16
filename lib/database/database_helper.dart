@@ -3,13 +3,15 @@ import 'package:path/path.dart';
 import '../models/transaction.dart' as model;
 import '../models/category.dart';
 import '../models/budget.dart';
+import '../models/recurring_transaction.dart';
 
 class DatabaseHelper {
   static const _databaseName = 'expense_tracker.db';
-  static const _databaseVersion = 2;
+  static const _databaseVersion = 3;
   static const _transactionsTable = 'transactions';
   static const _categoriesTable = 'categories';
   static const _budgetsTable = 'budgets';
+  static const _recurringTransactionsTable = 'recurring_transactions';
 
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -73,6 +75,25 @@ class DatabaseHelper {
       )
     ''');
 
+    // Create recurring transactions table
+    await db.execute('''
+      CREATE TABLE $_recurringTransactionsTable (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        amount REAL NOT NULL,
+        category_id INTEGER NOT NULL,
+        description TEXT,
+        type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
+        frequency TEXT NOT NULL CHECK (frequency IN ('daily', 'weekly', 'monthly', 'yearly')),
+        start_date INTEGER NOT NULL,
+        end_date INTEGER,
+        next_due_date INTEGER NOT NULL,
+        last_executed_date INTEGER,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        FOREIGN KEY (category_id) REFERENCES $_categoriesTable (id)
+      )
+    ''');
+
     // Insert default categories
     await _insertDefaultCategories(db);
   }
@@ -81,6 +102,10 @@ class DatabaseHelper {
     if (oldVersion < 2) {
       // Migration from version 1 to 2
       await _migrateFromV1ToV2(db);
+    }
+    if (oldVersion < 3) {
+      // Migration from version 2 to 3 - Add recurring transactions table
+      await _migrateFromV2ToV3(db);
     }
   }
 
@@ -164,6 +189,27 @@ class DatabaseHelper {
     }
   }
 
+  Future _migrateFromV2ToV3(Database db) async {
+    // Create recurring transactions table
+    await db.execute('''
+      CREATE TABLE $_recurringTransactionsTable (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        amount REAL NOT NULL,
+        category_id INTEGER NOT NULL,
+        description TEXT,
+        type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
+        frequency TEXT NOT NULL CHECK (frequency IN ('daily', 'weekly', 'monthly', 'yearly')),
+        start_date INTEGER NOT NULL,
+        end_date INTEGER,
+        next_due_date INTEGER NOT NULL,
+        last_executed_date INTEGER,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        FOREIGN KEY (category_id) REFERENCES $_categoriesTable (id)
+      )
+    ''');
+  }
+
   // Transaction methods
   Future<int> insertTransaction(model.Transaction transaction) async {
     Database db = await database;
@@ -173,7 +219,10 @@ class DatabaseHelper {
   Future<List<model.Transaction>> getAllTransactions() async {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.rawQuery('''
-      SELECT t.*, c.* FROM $_transactionsTable t
+      SELECT
+        t.id, t.title, t.amount, t.category_id, t.date, t.description, t.type,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_transactionsTable t
       JOIN $_categoriesTable c ON t.category_id = c.id
       ORDER BY t.date DESC
     ''');
@@ -187,7 +236,10 @@ class DatabaseHelper {
   Future<List<model.Transaction>> getTransactionsByType(model.TransactionType type) async {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.rawQuery('''
-      SELECT t.*, c.* FROM $_transactionsTable t
+      SELECT
+        t.id, t.title, t.amount, t.category_id, t.date, t.description, t.type,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_transactionsTable t
       JOIN $_categoriesTable c ON t.category_id = c.id
       WHERE t.type = ?
       ORDER BY t.date DESC
@@ -202,7 +254,10 @@ class DatabaseHelper {
   Future<List<model.Transaction>> getTransactionsByCategory(Category category) async {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.rawQuery('''
-      SELECT t.*, c.* FROM $_transactionsTable t
+      SELECT
+        t.id, t.title, t.amount, t.category_id, t.date, t.description, t.type,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_transactionsTable t
       JOIN $_categoriesTable c ON t.category_id = c.id
       WHERE t.category_id = ?
       ORDER BY t.date DESC
@@ -230,7 +285,10 @@ class DatabaseHelper {
     }
     
     List<Map<String, dynamic>> maps = await db.rawQuery('''
-      SELECT t.*, c.* FROM $_transactionsTable t
+      SELECT
+        t.id, t.title, t.amount, t.category_id, t.date, t.description, t.type,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_transactionsTable t
       JOIN $_categoriesTable c ON t.category_id = c.id
       WHERE $whereClause
       ORDER BY t.date DESC
@@ -401,7 +459,10 @@ class DatabaseHelper {
   Future<List<Budget>> getAllBudgets() async {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.rawQuery('''
-      SELECT b.*, c.* FROM $_budgetsTable b
+      SELECT
+        b.id, b.category_id, b.amount, b.start_date, b.end_date, b.is_active,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_budgetsTable b
       LEFT JOIN $_categoriesTable c ON b.category_id = c.id
       ORDER BY b.start_date DESC
     ''');
@@ -419,7 +480,10 @@ class DatabaseHelper {
     final now = DateTime.now().millisecondsSinceEpoch;
     
     List<Map<String, dynamic>> maps = await db.rawQuery('''
-      SELECT b.*, c.* FROM $_budgetsTable b
+      SELECT
+        b.id, b.category_id, b.amount, b.start_date, b.end_date, b.is_active,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_budgetsTable b
       LEFT JOIN $_categoriesTable c ON b.category_id = c.id
       WHERE b.is_active = 1 AND b.start_date <= ? AND b.end_date >= ?
       ORDER BY b.start_date DESC
@@ -469,5 +533,157 @@ class DatabaseHelper {
     ''', whereArgs);
     
     return result[0]['total'] ?? 0.0;
+  }
+
+  // Recurring Transaction methods
+  Future<int> insertRecurringTransaction(RecurringTransaction recurringTransaction) async {
+    Database db = await database;
+    return await db.insert(_recurringTransactionsTable, recurringTransaction.toMap());
+  }
+
+  Future<List<RecurringTransaction>> getAllRecurringTransactions() async {
+    Database db = await database;
+    List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT
+        rt.id, rt.title, rt.amount, rt.category_id, rt.description, rt.type,
+        rt.frequency, rt.start_date, rt.end_date, rt.next_due_date, rt.last_executed_date, rt.is_active,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_recurringTransactionsTable rt
+      JOIN $_categoriesTable c ON rt.category_id = c.id
+      ORDER BY rt.next_due_date ASC
+    ''');
+
+    return List.generate(maps.length, (i) {
+      Category category = Category.fromMap(maps[i]);
+      return RecurringTransaction.fromMap(maps[i], category);
+    });
+  }
+
+  Future<List<RecurringTransaction>> getActiveRecurringTransactions() async {
+    Database db = await database;
+    List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT
+        rt.id, rt.title, rt.amount, rt.category_id, rt.description, rt.type,
+        rt.frequency, rt.start_date, rt.end_date, rt.next_due_date, rt.last_executed_date, rt.is_active,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_recurringTransactionsTable rt
+      JOIN $_categoriesTable c ON rt.category_id = c.id
+      WHERE rt.is_active = 1
+      ORDER BY rt.next_due_date ASC
+    ''');
+
+    return List.generate(maps.length, (i) {
+      Category category = Category.fromMap(maps[i]);
+      return RecurringTransaction.fromMap(maps[i], category);
+    });
+  }
+
+  Future<List<RecurringTransaction>> getDueRecurringTransactions() async {
+    Database db = await database;
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT
+        rt.id, rt.title, rt.amount, rt.category_id, rt.description, rt.type,
+        rt.frequency, rt.start_date, rt.end_date, rt.next_due_date, rt.last_executed_date, rt.is_active,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_recurringTransactionsTable rt
+      JOIN $_categoriesTable c ON rt.category_id = c.id
+      WHERE rt.is_active = 1 AND rt.next_due_date <= ?
+      ORDER BY rt.next_due_date ASC
+    ''', [now]);
+
+    return List.generate(maps.length, (i) {
+      Category category = Category.fromMap(maps[i]);
+      return RecurringTransaction.fromMap(maps[i], category);
+    });
+  }
+
+  Future<List<RecurringTransaction>> getRecurringTransactionsByType(model.TransactionType type) async {
+    Database db = await database;
+    List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT
+        rt.id, rt.title, rt.amount, rt.category_id, rt.description, rt.type,
+        rt.frequency, rt.start_date, rt.end_date, rt.next_due_date, rt.last_executed_date, rt.is_active,
+        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+      FROM $_recurringTransactionsTable rt
+      JOIN $_categoriesTable c ON rt.category_id = c.id
+      WHERE rt.type = ?
+      ORDER BY rt.next_due_date ASC
+    ''', [type.name]);
+
+    return List.generate(maps.length, (i) {
+      Category category = Category.fromMap(maps[i]);
+      return RecurringTransaction.fromMap(maps[i], category);
+    });
+  }
+
+  Future<int> updateRecurringTransaction(RecurringTransaction recurringTransaction) async {
+    Database db = await database;
+    return await db.update(
+      _recurringTransactionsTable,
+      recurringTransaction.toMap(),
+      where: 'id = ?',
+      whereArgs: [recurringTransaction.id],
+    );
+  }
+
+  Future<int> deleteRecurringTransaction(int id) async {
+    Database db = await database;
+    return await db.delete(_recurringTransactionsTable, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> executeRecurringTransaction(RecurringTransaction recurringTransaction) async {
+    Database db = await database;
+
+    // Begin transaction to ensure data consistency
+    await db.transaction((txn) async {
+      // Create a new regular transaction
+      final transaction = recurringTransaction.toTransaction();
+      await txn.insert(_transactionsTable, transaction.toMap());
+
+      // Update the recurring transaction
+      final updatedRecurring = recurringTransaction.copyWith(
+        nextDueDate: recurringTransaction.calculateNextDueDate(),
+        lastExecutedDate: DateTime.now(),
+        isActive: recurringTransaction.shouldExpire ? false : recurringTransaction.isActive,
+      );
+
+      await txn.update(
+        _recurringTransactionsTable,
+        updatedRecurring.toMap(),
+        where: 'id = ?',
+        whereArgs: [recurringTransaction.id],
+      );
+    });
+  }
+
+  Future<void> processAllDueRecurringTransactions() async {
+    final dueTransactions = await getDueRecurringTransactions();
+
+    for (final recurringTransaction in dueTransactions) {
+      // Skip if it should expire
+      if (recurringTransaction.shouldExpire) {
+        // Deactivate expired recurring transaction
+        await updateRecurringTransaction(
+          recurringTransaction.copyWith(isActive: false),
+        );
+        continue;
+      }
+
+      // Execute the recurring transaction
+      await executeRecurringTransaction(recurringTransaction);
+    }
+  }
+
+  Future<int> getRecurringTransactionCount({bool activeOnly = false}) async {
+    Database db = await database;
+    String whereClause = activeOnly ? 'WHERE is_active = 1' : '';
+
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM $_recurringTransactionsTable $whereClause',
+    );
+
+    return result[0]['count'] ?? 0;
   }
 }
