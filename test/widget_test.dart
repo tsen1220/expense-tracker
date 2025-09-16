@@ -21,8 +21,7 @@ void main() {
     await tester.pumpWidget(const ExpenseTrackerApp());
     await tester.pump();
     
-    expect(find.text('Expense Tracker'), findsOneWidget);
-    expect(find.text('No expenses yet'), findsOneWidget);
+    expect(find.text('Financial Tracker'), findsOneWidget);
     expect(find.byIcon(Icons.add), findsOneWidget);
   });
 }

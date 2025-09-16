@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'screens/home_screen.dart';
+import 'screens/new_home_screen.dart';
 
 void main() {
   // Initialize sqflite for desktop platforms only
@@ -30,7 +30,7 @@ class ExpenseTrackerApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      home: const NewHomeScreen(),
     );
   }
 }
