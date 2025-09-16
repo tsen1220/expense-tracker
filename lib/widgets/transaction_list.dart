@@ -116,43 +116,78 @@ class TransactionList extends StatelessWidget {
                 ],
               ],
             ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  transaction.isExpense ? '-' : '+',
-                  style: TextStyle(
-                    color: transaction.isExpense ? Colors.red : Colors.green,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      transaction.isExpense ? '-' : '+',
+                      style: TextStyle(
+                        color: transaction.isExpense ? Colors.red : Colors.green,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      currencyFormatter.format(transaction.amount),
+                      style: TextStyle(
+                        color: transaction.isExpense ? Colors.red : Colors.green,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  currencyFormatter.format(transaction.amount),
-                  style: TextStyle(
-                    color: transaction.isExpense ? Colors.red : Colors.green,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                PopupMenuButton<String>(
+                  onSelected: (value) async {
+                    switch (value) {
+                      case 'edit':
+                        final result = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddTransactionScreen(
+                              transaction: transaction,
+                              initialType: transaction.type,
+                            ),
+                          ),
+                        );
+                        if (result == true) {
+                          onTransactionDeleted(); // Refresh the list
+                        }
+                        break;
+                      case 'delete':
+                        await _deleteTransaction(context, transaction);
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit),
+                          SizedBox(width: 8),
+                          Text('Edit'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Delete', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            onTap: () async {
-              final result = await Navigator.push<bool>(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddTransactionScreen(
-                    transaction: transaction,
-                    initialType: transaction.type,
-                  ),
-                ),
-              );
-              if (result == true) {
-                onTransactionDeleted(); // Refresh the list
-              }
-            },
-            onLongPress: () => _deleteTransaction(context, transaction),
           ),
         );
       },

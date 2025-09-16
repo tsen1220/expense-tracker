@@ -68,10 +68,18 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
 
   void _onTabChanged() {
     setState(() {
-      _selectedType = _tabController.index == 0 
-          ? TransactionType.expense 
+      _selectedType = _tabController.index == 0
+          ? TransactionType.expense
           : TransactionType.income;
       _selectedCategory = null; // Reset category when switching type
+
+      // Set default category for the new type if available
+      final newCategories = _selectedType == TransactionType.expense
+          ? _expenseCategories
+          : _incomeCategories;
+      if (newCategories.isNotEmpty) {
+        _selectedCategory = newCategories.first;
+      }
     });
   }
 
@@ -85,6 +93,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
       setState(() {
         _expenseCategories = expenseCategories;
         _incomeCategories = incomeCategories;
+
+        // Set default category if not already set (for new transactions)
+        if (_selectedCategory == null) {
+          final currentCategories = _selectedType == TransactionType.expense
+              ? expenseCategories
+              : incomeCategories;
+          if (currentCategories.isNotEmpty) {
+            _selectedCategory = currentCategories.first;
+          }
+        }
       });
     } catch (e) {
       if (mounted) {
@@ -277,6 +295,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
                 return DropdownMenuItem(
                   value: category,
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         width: 32,
@@ -292,7 +311,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(child: Text(category.displayName)),
+                      Text(category.displayName),
                     ],
                   ),
                 );
