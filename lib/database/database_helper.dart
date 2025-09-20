@@ -6,7 +6,7 @@ import '../models/recurring_transaction.dart';
 
 class DatabaseHelper {
   static const _databaseName = 'expense_tracker.db';
-  static const _databaseVersion = 3;
+  static const _databaseVersion = 1;
   static const _transactionsTable = 'transactions';
   static const _categoriesTable = 'categories';
   static const _recurringTransactionsTable = 'recurring_transactions';
@@ -28,7 +28,6 @@ class DatabaseHelper {
       path,
       version: _databaseVersion,
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
     );
   }
 
@@ -37,12 +36,13 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE $_categoriesTable (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL,
         display_name TEXT NOT NULL,
         icon_code INTEGER NOT NULL,
         color_value INTEGER NOT NULL,
         is_default INTEGER NOT NULL DEFAULT 0,
-        is_income_category INTEGER NOT NULL DEFAULT 0
+        is_income_category INTEGER NOT NULL DEFAULT 0,
+        UNIQUE(name, is_income_category)
       )
     ''');
 
@@ -84,105 +84,10 @@ class DatabaseHelper {
     await _insertDefaultCategories(db);
   }
 
-  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      // Migration from version 1 to 2
-      await _migrateFromV1ToV2(db);
-    }
-    if (oldVersion < 3) {
-      // Migration from version 2 to 3 - Add recurring transactions table
-      await _migrateFromV2ToV3(db);
-    }
-  }
-
   Future _insertDefaultCategories(Database db) async {
     for (Category category in DefaultCategories.allDefaultCategories) {
       await db.insert(_categoriesTable, category.toMap());
     }
-  }
-
-  Future _migrateFromV1ToV2(Database db) async {
-    // Create new tables
-    await db.execute('''
-      CREATE TABLE $_categoriesTable (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE,
-        display_name TEXT NOT NULL,
-        icon_code INTEGER NOT NULL,
-        color_value INTEGER NOT NULL,
-        is_default INTEGER NOT NULL DEFAULT 0,
-        is_income_category INTEGER NOT NULL DEFAULT 0
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE $_transactionsTable (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        amount REAL NOT NULL,
-        category_id INTEGER NOT NULL,
-        date INTEGER NOT NULL,
-        description TEXT,
-        type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
-        FOREIGN KEY (category_id) REFERENCES $_categoriesTable (id)
-      )
-    ''');
-
-
-    // Insert default categories
-    await _insertDefaultCategories(db);
-
-    // Migrate old expenses data if exists
-    try {
-      List<Map<String, dynamic>> oldExpenses = await db.query('expenses');
-      
-      for (Map<String, dynamic> expense in oldExpenses) {
-        // Find matching category by name
-        List<Map<String, dynamic>> categoryResult = await db.query(
-          _categoriesTable,
-          where: 'name = ?',
-          whereArgs: [expense['category']],
-          limit: 1,
-        );
-        
-        if (categoryResult.isNotEmpty) {
-          await db.insert(_transactionsTable, {
-            'title': expense['title'],
-            'amount': expense['amount'],
-            'category_id': categoryResult.first['id'],
-            'date': expense['date'],
-            'description': expense['description'],
-            'type': 'expense',
-          });
-        }
-      }
-      
-      // Drop old table
-      await db.execute('DROP TABLE IF EXISTS expenses');
-    } catch (e) {
-      // Old table might not exist, ignore error
-    }
-  }
-
-  Future _migrateFromV2ToV3(Database db) async {
-    // Create recurring transactions table
-    await db.execute('''
-      CREATE TABLE $_recurringTransactionsTable (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        amount REAL NOT NULL,
-        category_id INTEGER NOT NULL,
-        description TEXT,
-        type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
-        frequency TEXT NOT NULL CHECK (frequency IN ('daily', 'weekly', 'monthly', 'yearly')),
-        start_date INTEGER NOT NULL,
-        end_date INTEGER,
-        next_due_date INTEGER NOT NULL,
-        last_executed_date INTEGER,
-        is_active INTEGER NOT NULL DEFAULT 1,
-        FOREIGN KEY (category_id) REFERENCES $_categoriesTable (id)
-      )
-    ''');
   }
 
   // Transaction methods

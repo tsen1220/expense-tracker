@@ -182,8 +182,8 @@ class DefaultCategories {
       isIncomeCategory: true,
     ),
     Category(
-      name: 'other_income',
-      displayName: 'Other Income',
+      name: 'other',
+      displayName: 'Other',
       icon: Icons.attach_money,
       color: const Color(0xFF198754),
       isDefault: true,
