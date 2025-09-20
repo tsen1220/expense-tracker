@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/transaction.dart';
-import '../models/budget.dart';
 import '../models/recurring_transaction.dart';
 import '../database/database_helper.dart';
 import '../widgets/transaction_chart.dart';
 import '../widgets/transaction_list.dart';
-import '../widgets/budget_overview.dart';
 import '../services/recurring_transaction_service.dart';
 import 'add_transaction_screen.dart';
 import 'category_management_screen.dart';
-import 'budget_management_screen.dart';
 import 'recurring_transaction_management_screen.dart';
 import 'export_screen.dart';
 
@@ -26,7 +23,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
   late TabController _tabController;
   
   List<Transaction> _transactions = [];
-  List<Budget> _activeBudgets = [];
   List<RecurringTransaction> _dueRecurringTransactions = [];
   double _totalExpenses = 0.0;
   double _totalIncome = 0.0;
@@ -71,7 +67,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
       await Future.wait([
         _loadTransactions(),
         _loadTotals(),
-        _loadActiveBudgets(),
         _loadDueRecurringTransactions(),
       ]);
     } catch (e) {
@@ -117,12 +112,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
     });
   }
 
-  Future<void> _loadActiveBudgets() async {
-    final budgets = await DatabaseHelper.instance.getActiveBudgets();
-    setState(() {
-      _activeBudgets = budgets;
-    });
-  }
 
   Future<void> _loadDueRecurringTransactions() async {
     final dueTransactions = await RecurringTransactionService.instance.getDueTransactions();
@@ -167,14 +156,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                     ),
                   );
                   break;
-                case 'budgets':
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const BudgetManagementScreen(),
-                    ),
-                  );
-                  break;
                 case 'recurring':
                   Navigator.push(
                     context,
@@ -201,16 +182,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                     Icon(Icons.category),
                     SizedBox(width: 8),
                     Text('Manage Categories'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'budgets',
-                child: Row(
-                  children: [
-                    Icon(Icons.account_balance_wallet),
-                    SizedBox(width: 8),
-                    Text('Manage Budgets'),
                   ],
                 ),
               ),
@@ -377,9 +348,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                   ),
                 ),
                 
-                // Budget overview
-                if (_activeBudgets.isNotEmpty)
-                  BudgetOverview(budgets: _activeBudgets),
 
                 // Due recurring transactions notification
                 if (_dueRecurringTransactions.isNotEmpty)

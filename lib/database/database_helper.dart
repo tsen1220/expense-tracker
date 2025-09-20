@@ -2,7 +2,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/transaction.dart' as model;
 import '../models/category.dart';
-import '../models/budget.dart';
 import '../models/recurring_transaction.dart';
 
 class DatabaseHelper {
@@ -10,7 +9,6 @@ class DatabaseHelper {
   static const _databaseVersion = 3;
   static const _transactionsTable = 'transactions';
   static const _categoriesTable = 'categories';
-  static const _budgetsTable = 'budgets';
   static const _recurringTransactionsTable = 'recurring_transactions';
 
   DatabaseHelper._privateConstructor();
@@ -62,18 +60,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Create budgets table
-    await db.execute('''
-      CREATE TABLE $_budgetsTable (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        category_id INTEGER,
-        amount REAL NOT NULL,
-        start_date INTEGER NOT NULL,
-        end_date INTEGER NOT NULL,
-        is_active INTEGER NOT NULL DEFAULT 1,
-        FOREIGN KEY (category_id) REFERENCES $_categoriesTable (id)
-      )
-    ''');
 
     // Create recurring transactions table
     await db.execute('''
@@ -142,17 +128,6 @@ class DatabaseHelper {
       )
     ''');
 
-    await db.execute('''
-      CREATE TABLE $_budgetsTable (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        category_id INTEGER,
-        amount REAL NOT NULL,
-        start_date INTEGER NOT NULL,
-        end_date INTEGER NOT NULL,
-        is_active INTEGER NOT NULL DEFAULT 1,
-        FOREIGN KEY (category_id) REFERENCES $_categoriesTable (id)
-      )
-    ''');
 
     // Insert default categories
     await _insertDefaultCategories(db);
@@ -450,90 +425,6 @@ class DatabaseHelper {
     return await db.delete(_categoriesTable, where: 'id = ?', whereArgs: [id]);
   }
 
-  // Budget methods
-  Future<int> insertBudget(Budget budget) async {
-    Database db = await database;
-    return await db.insert(_budgetsTable, budget.toMap());
-  }
-
-  Future<List<Budget>> getAllBudgets() async {
-    Database db = await database;
-    List<Map<String, dynamic>> maps = await db.rawQuery('''
-      SELECT
-        b.id, b.category_id, b.amount, b.start_date, b.end_date, b.is_active,
-        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
-      FROM $_budgetsTable b
-      LEFT JOIN $_categoriesTable c ON b.category_id = c.id
-      ORDER BY b.start_date DESC
-    ''');
-    
-    return List.generate(maps.length, (i) {
-      Category? category = maps[i]['category_id'] != null 
-          ? Category.fromMap(maps[i]) 
-          : null;
-      return Budget.fromMap(maps[i], category);
-    });
-  }
-
-  Future<List<Budget>> getActiveBudgets() async {
-    Database db = await database;
-    final now = DateTime.now().millisecondsSinceEpoch;
-    
-    List<Map<String, dynamic>> maps = await db.rawQuery('''
-      SELECT
-        b.id, b.category_id, b.amount, b.start_date, b.end_date, b.is_active,
-        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
-      FROM $_budgetsTable b
-      LEFT JOIN $_categoriesTable c ON b.category_id = c.id
-      WHERE b.is_active = 1 AND b.start_date <= ? AND b.end_date >= ?
-      ORDER BY b.start_date DESC
-    ''', [now, now]);
-    
-    return List.generate(maps.length, (i) {
-      Category? category = maps[i]['category_id'] != null 
-          ? Category.fromMap(maps[i]) 
-          : null;
-      return Budget.fromMap(maps[i], category);
-    });
-  }
-
-  Future<int> updateBudget(Budget budget) async {
-    Database db = await database;
-    return await db.update(
-      _budgetsTable,
-      budget.toMap(),
-      where: 'id = ?',
-      whereArgs: [budget.id],
-    );
-  }
-
-  Future<int> deleteBudget(int id) async {
-    Database db = await database;
-    return await db.delete(_budgetsTable, where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<double> getBudgetUsage(Budget budget) async {
-    Database db = await database;
-    
-    String whereClause = 't.date >= ? AND t.date <= ? AND t.type = ?';
-    List<dynamic> whereArgs = [
-      budget.startDate.millisecondsSinceEpoch,
-      budget.endDate.millisecondsSinceEpoch,
-      'expense',
-    ];
-
-    if (budget.category != null) {
-      whereClause += ' AND t.category_id = ?';
-      whereArgs.add(budget.category!.id);
-    }
-
-    List<Map<String, dynamic>> result = await db.rawQuery('''
-      SELECT SUM(t.amount) as total FROM $_transactionsTable t
-      WHERE $whereClause
-    ''', whereArgs);
-    
-    return result[0]['total'] ?? 0.0;
-  }
 
   // Recurring Transaction methods
   Future<int> insertRecurringTransaction(RecurringTransaction recurringTransaction) async {
