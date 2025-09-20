@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/transaction.dart';
-import '../models/recurring_transaction.dart';
 import '../database/database_helper.dart';
 import '../widgets/transaction_chart.dart';
 import '../widgets/transaction_list.dart';
 import '../widgets/theme_toggle_button.dart';
-import '../services/recurring_transaction_service.dart';
 import 'add_transaction_screen.dart';
 import 'category_management_screen.dart';
-import 'recurring_transaction_management_screen.dart';
 import 'export_screen.dart';
 
 class NewHomeScreen extends StatefulWidget {
@@ -24,7 +21,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
   late TabController _tabController;
   
   List<Transaction> _transactions = [];
-  List<RecurringTransaction> _dueRecurringTransactions = [];
   double _totalExpenses = 0.0;
   double _totalIncome = 0.0;
   double _netBalance = 0.0;
@@ -40,9 +36,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
     _tabController.addListener(_onTabChanged);
     _selectedMonth = DateTime(DateTime.now().year, DateTime.now().month);
     _loadData();
-
-    // Set up recurring transaction service callback
-    RecurringTransactionService.instance.setOnTransactionsProcessedCallback(_loadData);
   }
 
   @override
@@ -68,7 +61,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
       await Future.wait([
         _loadTransactions(),
         _loadTotals(),
-        _loadDueRecurringTransactions(),
       ]);
     } catch (e) {
       if (mounted) {
@@ -114,12 +106,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
   }
 
 
-  Future<void> _loadDueRecurringTransactions() async {
-    final dueTransactions = await RecurringTransactionService.instance.getDueTransactions();
-    setState(() {
-      _dueRecurringTransactions = dueTransactions;
-    });
-  }
 
   Future<void> _selectMonth() async {
     await showDialog<DateTime>(
@@ -158,14 +144,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                     ),
                   );
                   break;
-                case 'recurring':
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RecurringTransactionManagementScreen(),
-                    ),
-                  ).then((_) => _loadData());
-                  break;
                 case 'export':
                   Navigator.push(
                     context,
@@ -184,20 +162,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                     Icon(Icons.category),
                     SizedBox(width: 8),
                     Text('Manage Categories'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'recurring',
-                child: Row(
-                  children: [
-                    Badge(
-                      label: Text(_dueRecurringTransactions.length.toString()),
-                      isLabelVisible: _dueRecurringTransactions.isNotEmpty,
-                      child: const Icon(Icons.repeat),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('Recurring Transactions'),
                   ],
                 ),
               ),
@@ -351,9 +315,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                 ),
                 
 
-                // Due recurring transactions notification
-                if (_dueRecurringTransactions.isNotEmpty)
-                  _buildDueRecurringTransactionsNotification(),
 
                 // Tab bar for income/expense
                 Material(
@@ -464,148 +425,6 @@ class _NewHomeScreenState extends State<NewHomeScreen>
     );
   }
 
-  Widget _buildDueRecurringTransactionsNotification() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Card(
-        color: Colors.orange.shade50,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.notification_important, color: Colors.orange.shade700),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '${_dueRecurringTransactions.length} recurring transaction(s) due',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange.shade700,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      await RecurringTransactionService.instance.processAllDueRecurringTransactions();
-                      _loadData();
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('All due transactions processed'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text('Execute All'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 80,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _dueRecurringTransactions.length,
-                  itemBuilder: (context, index) {
-                    final rt = _dueRecurringTransactions[index];
-                    final currencyFormatter = NumberFormat.currency(symbol: '\$');
-
-                    return Container(
-                      width: 200,
-                      margin: const EdgeInsets.only(right: 8),
-                      child: Card(
-                        child: InkWell(
-                          onTap: () async {
-                            await RecurringTransactionService.instance.executeRecurringTransaction(rt);
-                            _loadData();
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Executed: ${rt.title}'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor: rt.category.color,
-                                      child: Icon(
-                                        rt.category.icon,
-                                        size: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        rt.title,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  currencyFormatter.format(rt.amount),
-                                  style: TextStyle(
-                                    color: rt.isExpense ? Colors.red : Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  rt.frequency.displayName,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 4),
-              Center(
-                child: TextButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RecurringTransactionManagementScreen(),
-                      ),
-                    ).then((_) => _loadData());
-                  },
-                  icon: const Icon(Icons.manage_accounts),
-                  label: const Text('Manage All'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _DatePickerPopup extends StatefulWidget {

@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:provider/provider.dart';
 import 'screens/new_home_screen.dart';
-import 'services/recurring_transaction_service.dart';
 import 'providers/theme_provider.dart';
 import 'services/theme_service.dart';
 
@@ -37,19 +36,12 @@ class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
   void initState() {
     super.initState();
     _themeProvider = ThemeProvider();
-    _initializeServices();
   }
 
   @override
   void dispose() {
     _themeProvider.dispose();
-    RecurringTransactionService.instance.dispose();
     super.dispose();
-  }
-
-  Future<void> _initializeServices() async {
-    // Initialize recurring transaction service
-    await RecurringTransactionService.instance.initialize();
   }
 
   @override
