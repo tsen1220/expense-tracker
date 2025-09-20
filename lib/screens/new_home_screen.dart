@@ -5,6 +5,7 @@ import '../models/recurring_transaction.dart';
 import '../database/database_helper.dart';
 import '../widgets/transaction_chart.dart';
 import '../widgets/transaction_list.dart';
+import '../widgets/theme_toggle_button.dart';
 import '../services/recurring_transaction_service.dart';
 import 'add_transaction_screen.dart';
 import 'category_management_screen.dart';
@@ -145,6 +146,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
       appBar: AppBar(
         toolbarHeight: 50,
         actions: [
+          const ThemeToggleButton(),
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {

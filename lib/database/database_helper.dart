@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import '../models/transaction.dart' as model;
 import '../models/category.dart';
 import '../models/recurring_transaction.dart';
+import '../models/theme_preference.dart';
 
 class DatabaseHelper {
   static const _databaseName = 'expense_tracker.db';
@@ -10,6 +11,7 @@ class DatabaseHelper {
   static const _transactionsTable = 'transactions';
   static const _categoriesTable = 'categories';
   static const _recurringTransactionsTable = 'recurring_transactions';
+  static const _themePreferencesTable = 'theme_preferences';
 
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -80,14 +82,35 @@ class DatabaseHelper {
       )
     ''');
 
+    // Create theme preferences table
+    await db.execute('''
+      CREATE TABLE $_themePreferencesTable (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        theme_mode TEXT NOT NULL CHECK (theme_mode IN ('light', 'dark', 'system')),
+        last_updated INTEGER NOT NULL
+      )
+    ''');
+
     // Insert default categories
     await _insertDefaultCategories(db);
+
+    // Insert default theme preference
+    await _insertDefaultThemePreference(db);
   }
+
 
   Future _insertDefaultCategories(Database db) async {
     for (Category category in DefaultCategories.allDefaultCategories) {
       await db.insert(_categoriesTable, category.toMap());
     }
+  }
+
+  Future _insertDefaultThemePreference(Database db) async {
+    final defaultTheme = ThemePreference(
+      themeMode: AppThemeMode.system,
+      lastUpdated: DateTime.now(),
+    );
+    await db.insert(_themePreferencesTable, defaultTheme.toMap());
   }
 
   // Transaction methods
@@ -481,5 +504,52 @@ class DatabaseHelper {
     );
 
     return result[0]['count'] ?? 0;
+  }
+
+  // Theme preference methods
+  Future<ThemePreference> getThemePreference() async {
+    Database db = await database;
+    List<Map<String, dynamic>> maps = await db.query(
+      _themePreferencesTable,
+      limit: 1,
+      orderBy: 'last_updated DESC',
+    );
+
+    if (maps.isNotEmpty) {
+      return ThemePreference.fromMap(maps.first);
+    } else {
+      // Return default theme if none exists
+      final defaultTheme = ThemePreference(
+        themeMode: AppThemeMode.system,
+        lastUpdated: DateTime.now(),
+      );
+      await insertThemePreference(defaultTheme);
+      return defaultTheme;
+    }
+  }
+
+  Future<int> insertThemePreference(ThemePreference themePreference) async {
+    Database db = await database;
+    return await db.insert(_themePreferencesTable, themePreference.toMap());
+  }
+
+  Future<int> updateThemePreference(ThemePreference themePreference) async {
+    Database db = await database;
+
+    // Clear all existing preferences first (we only want one)
+    await db.delete(_themePreferencesTable);
+
+    // Insert the new preference
+    return await db.insert(_themePreferencesTable, themePreference.copyWith(
+      lastUpdated: DateTime.now(),
+    ).toMap());
+  }
+
+  Future<void> setThemeMode(AppThemeMode themeMode) async {
+    final themePreference = ThemePreference(
+      themeMode: themeMode,
+      lastUpdated: DateTime.now(),
+    );
+    await updateThemePreference(themePreference);
   }
 }

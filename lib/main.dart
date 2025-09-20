@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:provider/provider.dart';
 import 'screens/new_home_screen.dart';
 import 'services/recurring_transaction_service.dart';
+import 'providers/theme_provider.dart';
+import 'services/theme_service.dart';
 
 void main() {
   // Initialize sqflite for desktop platforms only
@@ -28,14 +31,18 @@ class ExpenseTrackerApp extends StatefulWidget {
 }
 
 class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
+  late ThemeProvider _themeProvider;
+
   @override
   void initState() {
     super.initState();
+    _themeProvider = ThemeProvider();
     _initializeServices();
   }
 
   @override
   void dispose() {
+    _themeProvider.dispose();
     RecurringTransactionService.instance.dispose();
     super.dispose();
   }
@@ -47,13 +54,32 @@ class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Expense Tracker',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
-      home: const NewHomeScreen(),
+    return ListenableBuilder(
+      listenable: _themeProvider,
+      builder: (context, child) {
+        if (_themeProvider.isLoading) {
+          return MaterialApp(
+            title: 'Expense Tracker',
+            theme: ThemeService.instance.lightTheme,
+            home: const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        }
+
+        return MaterialApp(
+          title: 'Expense Tracker',
+          theme: ThemeService.instance.lightTheme,
+          darkTheme: ThemeService.instance.darkTheme,
+          themeMode: _themeProvider.themeMode,
+          home: ChangeNotifierProvider<ThemeProvider>.value(
+            value: _themeProvider,
+            child: const NewHomeScreen(),
+          ),
+        );
+      },
     );
   }
 }
