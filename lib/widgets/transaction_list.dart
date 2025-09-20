@@ -124,14 +124,6 @@ class TransactionList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      transaction.isExpense ? '-' : '+',
-                      style: TextStyle(
-                        color: transaction.isExpense ? Colors.red : Colors.green,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
                       currencyFormatter.format(transaction.amount),
                       style: TextStyle(
                         color: transaction.isExpense ? Colors.red : Colors.green,
