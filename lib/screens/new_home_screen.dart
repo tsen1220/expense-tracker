@@ -12,6 +12,7 @@ import 'add_transaction_screen.dart';
 import 'category_management_screen.dart';
 import 'budget_management_screen.dart';
 import 'recurring_transaction_management_screen.dart';
+import 'export_screen.dart';
 
 class NewHomeScreen extends StatefulWidget {
   const NewHomeScreen({super.key});
@@ -33,6 +34,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
   DateTime _selectedMonth = DateTime.now();
   TransactionType _currentType = TransactionType.expense;
   bool _isLoading = true;
+
 
   @override
   void initState() {
@@ -130,20 +132,20 @@ class _NewHomeScreenState extends State<NewHomeScreen>
   }
 
   Future<void> _selectMonth() async {
-    final picked = await showDatePicker(
+    await showDialog<DateTime>(
       context: context,
-      initialDate: _selectedMonth,
-      firstDate: DateTime(2020, 1),
-      lastDate: DateTime.now(),
-      initialDatePickerMode: DatePickerMode.year,
+      builder: (BuildContext context) {
+        return _DatePickerPopup(
+          selectedDate: _selectedMonth,
+          onDateSelected: (DateTime selectedDate) {
+            setState(() {
+              _selectedMonth = DateTime(selectedDate.year, selectedDate.month);
+            });
+            _loadData();
+          },
+        );
+      },
     );
-    
-    if (picked != null) {
-      setState(() {
-        _selectedMonth = DateTime(picked.year, picked.month);
-      });
-      _loadData();
-    }
   }
 
   @override
@@ -152,7 +154,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Financial Tracker'),
+        toolbarHeight: 50,
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -180,6 +182,14 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                       builder: (context) => const RecurringTransactionManagementScreen(),
                     ),
                   ).then((_) => _loadData());
+                  break;
+                case 'export':
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ExportScreen(),
+                    ),
+                  );
                   break;
               }
             },
@@ -218,6 +228,16 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                   ],
                 ),
               ),
+              const PopupMenuItem(
+                value: 'export',
+                child: Row(
+                  children: [
+                    Icon(Icons.file_download),
+                    SizedBox(width: 8),
+                    Text('Export Data'),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -228,7 +248,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
               children: [
                 // Month selector and summary
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   color: Theme.of(context).colorScheme.surfaceVariant,
                   child: Column(
                     children: [
@@ -236,43 +256,52 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                         onTap: _selectMonth,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                            horizontal: 12,
+                            vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 DateFormat('MMMM yyyy').format(_selectedMonth),
-                                style: Theme.of(context).textTheme.titleLarge,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                              const Icon(Icons.calendar_month),
+                              Icon(Icons.calendar_month, size: 18),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           Expanded(
                             child: Card(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
                               color: Colors.green.shade50,
                               child: Padding(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.trending_up, color: Colors.green),
-                                    const SizedBox(height: 4),
-                                    const Text('Income', style: TextStyle(fontSize: 12)),
-                                    Text(
-                                      currencyFormatter.format(_totalIncome),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green,
+                                    Icon(Icons.trending_up, color: Colors.green, size: 16),
+                                    const SizedBox(height: 2),
+                                    Text('Income', style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        currencyFormatter.format(_totalIncome),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -282,19 +311,25 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                           ),
                           Expanded(
                             child: Card(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
                               color: Colors.red.shade50,
                               child: Padding(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.trending_down, color: Colors.red),
-                                    const SizedBox(height: 4),
-                                    const Text('Expenses', style: TextStyle(fontSize: 12)),
-                                    Text(
-                                      currencyFormatter.format(_totalExpenses),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red,
+                                    Icon(Icons.trending_down, color: Colors.red, size: 16),
+                                    const SizedBox(height: 2),
+                                    Text('Expenses', style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        currencyFormatter.format(_totalExpenses),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -304,24 +339,31 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                           ),
                           Expanded(
                             child: Card(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
                               color: _netBalance >= 0 ? Colors.blue.shade50 : Colors.orange.shade50,
                               child: Padding(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      _netBalance >= 0 
-                                          ? Icons.account_balance 
+                                      _netBalance >= 0
+                                          ? Icons.account_balance
                                           : Icons.warning,
                                       color: _netBalance >= 0 ? Colors.blue : Colors.orange,
+                                      size: 16,
                                     ),
-                                    const SizedBox(height: 4),
-                                    const Text('Net', style: TextStyle(fontSize: 12)),
-                                    Text(
-                                      currencyFormatter.format(_netBalance),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: _netBalance >= 0 ? Colors.blue : Colors.orange,
+                                    const SizedBox(height: 2),
+                                    Text('Net', style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        currencyFormatter.format(_netBalance),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: _netBalance >= 0 ? Colors.blue : Colors.orange,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -344,12 +386,25 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                   _buildDueRecurringTransactionsNotification(),
 
                 // Tab bar for income/expense
-                TabBar(
-                  controller: _tabController,
-                  tabs: const [
-                    Tab(text: 'Expenses', icon: Icon(Icons.trending_down)),
-                    Tab(text: 'Income', icon: Icon(Icons.trending_up)),
-                  ],
+                Material(
+                  child: TabBar(
+                    controller: _tabController,
+                    labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    unselectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w400),
+                    tabAlignment: TabAlignment.fill,
+                    tabs: [
+                      Tab(
+                        text: 'Expenses',
+                        icon: Icon(Icons.trending_down, size: 16),
+                        height: 40,
+                      ),
+                      Tab(
+                        text: 'Income',
+                        icon: Icon(Icons.trending_up, size: 16),
+                        height: 40,
+                      ),
+                    ],
+                  ),
                 ),
                 
                 // Content area
@@ -391,8 +446,8 @@ class _NewHomeScreenState extends State<NewHomeScreen>
         // Chart section
         if (typeTransactions.isNotEmpty) ...[
           Container(
-            height: 200,
-            padding: const EdgeInsets.all(16),
+            height: 140,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TransactionChart(
               transactions: typeTransactions,
               type: type,
@@ -577,6 +632,205 @@ class _NewHomeScreenState extends State<NewHomeScreen>
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DatePickerPopup extends StatefulWidget {
+  final DateTime selectedDate;
+  final Function(DateTime) onDateSelected;
+
+  const _DatePickerPopup({
+    required this.selectedDate,
+    required this.onDateSelected,
+  });
+
+  @override
+  State<_DatePickerPopup> createState() => _DatePickerPopupState();
+}
+
+class _DatePickerPopupState extends State<_DatePickerPopup> {
+  late int _selectedYear;
+  int? _selectedMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedYear = widget.selectedDate.year;
+    _selectedMonth = widget.selectedDate.month;
+  }
+
+  List<int> get _availableYears {
+    final currentYear = DateTime.now().year;
+    final years = <int>[];
+
+    // Start from current year and go backwards
+    for (int year = currentYear; year >= 2020; year--) {
+      years.add(year);
+    }
+
+    return years;
+  }
+
+  void _onYearChanged(int year) {
+    setState(() {
+      _selectedYear = year;
+    });
+  }
+
+  void _onMonthSelected(int month) {
+    setState(() {
+      _selectedMonth = month;
+    });
+
+    final selectedDate = DateTime(_selectedYear, month);
+    widget.onDateSelected(selectedDate);
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Dialog(
+      child: Container(
+        width: 360,
+        height: 420,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Select Date',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Year dropdown
+            Text(
+              'Year:',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: theme.colorScheme.outline),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  value: _selectedYear,
+                  isExpanded: true,
+                  items: _availableYears.map((year) {
+                    return DropdownMenuItem<int>(
+                      value: year,
+                      child: Text(
+                        year.toString(),
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (year) {
+                    if (year != null) {
+                      _onYearChanged(year);
+                    }
+                  },
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Month grid
+            Text(
+              'Month:',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // 12 month grid (4x3)
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  childAspectRatio: 2.2,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: 12,
+                itemBuilder: (context, index) {
+                  final month = index + 1;
+                  final isSelected = _selectedMonth == month;
+
+                  return Material(
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.surfaceVariant,
+                    borderRadius: BorderRadius.circular(8),
+                    child: InkWell(
+                      onTap: () => _onMonthSelected(month),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Text(
+                          DateFormat('MMM').format(DateTime(_selectedYear, month)),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isSelected
+                                ? theme.colorScheme.onPrimary
+                                : theme.colorScheme.onSurfaceVariant,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Current selection info
+            if (_selectedMonth != null)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Selected: ${DateFormat('MMMM yyyy').format(DateTime(_selectedYear, _selectedMonth!))}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+          ],
         ),
       ),
     );

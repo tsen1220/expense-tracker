@@ -55,9 +55,9 @@ class TransactionChart extends StatelessWidget {
         color: category.color,
         value: amount,
         title: '${percentage.toStringAsFixed(0)}%',
-        radius: 60,
+        radius: 40,
         titleStyle: const TextStyle(
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -66,80 +66,72 @@ class TransactionChart extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(12),
+        child: Row(
           children: [
-            Text(
-              type == TransactionType.expense 
-                  ? 'Expense Breakdown' 
-                  : 'Income Breakdown',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 16),
             Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: PieChart(
-                      PieChartData(
-                        sections: sections,
-                        borderData: FlBorderData(show: false),
-                        sectionsSpace: 2,
-                        centerSpaceRadius: 0,
-                      ),
-                    ),
+              flex: 2,
+              child: SizedBox(
+                height: 120,
+                child: PieChart(
+                  PieChartData(
+                    sections: sections,
+                    borderData: FlBorderData(show: false),
+                    sectionsSpace: 1,
+                    centerSpaceRadius: 0,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    flex: 2,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: categoryTotals.entries.map((entry) {
-                          final category = entry.key;
-                          final amount = entry.value;
-                          
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Row(
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: categoryTotals.entries.map((entry) {
+                    final category = entry.key;
+                    final amount = entry.value;
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: category.color,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 16,
-                                  height: 16,
-                                  decoration: BoxDecoration(
-                                    color: category.color,
-                                    shape: BoxShape.circle,
+                                Text(
+                                  category.displayName,
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontSize: 11,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        category.displayName,
-                                        style: Theme.of(context).textTheme.bodySmall,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        '\$${amount.toStringAsFixed(0)}',
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                                Text(
+                                  '\$${amount.toStringAsFixed(0)}',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
                                   ),
                                 ),
                               ],
                             ),
-                          );
-                        }).toList(),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ],
