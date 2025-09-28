@@ -20,30 +20,38 @@ class LanguageToggleButton extends StatelessWidget {
           itemBuilder: (BuildContext context) => [
             PopupMenuItem<AppLanguage>(
               value: AppLanguage.english,
-              child: Row(
-                children: [
-                  Radio<AppLanguage>(
-                    value: AppLanguage.english,
-                    groupValue: languageProvider.currentLanguage,
-                    onChanged: null,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(AppLocalizations.of(context)!.english),
-                ],
+              child: RadioGroup<AppLanguage>(
+                groupValue: languageProvider.currentLanguage,
+                onChanged: (AppLanguage? value) {
+                  if (value != null) {
+                    languageProvider.setLanguage(value);
+                  }
+                },
+                child: Row(
+                  children: [
+                    Radio<AppLanguage>(value: AppLanguage.english),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context)!.english),
+                  ],
+                ),
               ),
             ),
             PopupMenuItem<AppLanguage>(
               value: AppLanguage.traditionalChinese,
-              child: Row(
-                children: [
-                  Radio<AppLanguage>(
-                    value: AppLanguage.traditionalChinese,
-                    groupValue: languageProvider.currentLanguage,
-                    onChanged: null,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(AppLocalizations.of(context)!.traditionalChinese),
-                ],
+              child: RadioGroup<AppLanguage>(
+                groupValue: languageProvider.currentLanguage,
+                onChanged: (AppLanguage? value) {
+                  if (value != null) {
+                    languageProvider.setLanguage(value);
+                  }
+                },
+                child: Row(
+                  children: [
+                    Radio<AppLanguage>(value: AppLanguage.traditionalChinese),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context)!.traditionalChinese),
+                  ],
+                ),
               ),
             ),
           ],
@@ -88,29 +96,27 @@ class LanguageSelector extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Card(
-              child: Column(
-                children: [
-                  RadioListTile<AppLanguage>(
-                    title: Text(AppLocalizations.of(context)!.english),
-                    value: AppLanguage.english,
-                    groupValue: languageProvider.currentLanguage,
-                    onChanged: (AppLanguage? value) {
-                      if (value != null) {
-                        languageProvider.setLanguage(value);
-                      }
-                    },
-                  ),
-                  RadioListTile<AppLanguage>(
-                    title: Text(AppLocalizations.of(context)!.traditionalChinese),
-                    value: AppLanguage.traditionalChinese,
-                    groupValue: languageProvider.currentLanguage,
-                    onChanged: (AppLanguage? value) {
-                      if (value != null) {
-                        languageProvider.setLanguage(value);
-                      }
-                    },
-                  ),
-                ],
+              child: RadioGroup<AppLanguage>(
+                groupValue: languageProvider.currentLanguage,
+                onChanged: (AppLanguage? value) {
+                  if (value != null) {
+                    languageProvider.setLanguage(value);
+                  }
+                },
+                child: Column(
+                  children: [
+                    RadioListTile<AppLanguage>(
+                      title: Text(AppLocalizations.of(context)!.english),
+                      value: AppLanguage.english,
+                    ),
+                    RadioListTile<AppLanguage>(
+                      title: Text(
+                        AppLocalizations.of(context)!.traditionalChinese,
+                      ),
+                      value: AppLanguage.traditionalChinese,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
