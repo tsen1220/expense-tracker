@@ -246,7 +246,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                     horizontal: 16,
                     vertical: 8,
                   ),
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   child: Column(
                     children: [
                       InkWell(
@@ -823,7 +823,7 @@ class _DatePickerPopupState extends State<_DatePickerPopup> {
                   return Material(
                     color: isSelected
                         ? theme.colorScheme.primary
-                        : theme.colorScheme.surfaceVariant,
+                        : theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                     child: InkWell(
                       onTap: () => _onMonthSelected(month),

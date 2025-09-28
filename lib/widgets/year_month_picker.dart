@@ -157,7 +157,7 @@ class _YearMonthPickerState extends State<YearMonthPicker> {
                   return Material(
                     color: isSelected
                         ? theme.colorScheme.primary
-                        : theme.colorScheme.surfaceVariant,
+                        : theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                     child: InkWell(
                       onTap: () => _onMonthSelected(month),
