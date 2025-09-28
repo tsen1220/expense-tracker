@@ -14,12 +14,17 @@ class TransactionList extends StatelessWidget {
     required this.onTransactionDeleted,
   });
 
-  Future<void> _deleteTransaction(BuildContext context, Transaction transaction) async {
+  Future<void> _deleteTransaction(
+    BuildContext context,
+    Transaction transaction,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Transaction'),
-        content: Text('Are you sure you want to delete "${transaction.title}"?'),
+        content: Text(
+          'Are you sure you want to delete "${transaction.title}"?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -50,9 +55,7 @@ class TransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (transactions.isEmpty) {
-      return const Center(
-        child: Text('No transactions found'),
-      );
+      return const Center(child: Text('No transactions found'));
     }
 
     final currencyFormatter = NumberFormat.currency(symbol: '\$');
@@ -64,7 +67,7 @@ class TransactionList extends StatelessWidget {
       separatorBuilder: (context, index) => const SizedBox(height: 2),
       itemBuilder: (context, index) {
         final transaction = transactions[index];
-        
+
         return Card(
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(
@@ -75,7 +78,7 @@ class TransactionList extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: transaction.category.color.withOpacity(0.2),
+                color: transaction.category.color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
@@ -86,9 +89,9 @@ class TransactionList extends StatelessWidget {
             ),
             title: Text(
               transaction.title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,9 +102,9 @@ class TransactionList extends StatelessWidget {
                 ),
                 Text(
                   dateFormatter.format(transaction.date),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
                 ),
                 if (transaction.description != null &&
                     transaction.description!.isNotEmpty) ...[
@@ -129,7 +132,9 @@ class TransactionList extends StatelessWidget {
                     Text(
                       currencyFormatter.format(transaction.amount),
                       style: TextStyle(
-                        color: transaction.isExpense ? Colors.red : Colors.green,
+                        color: transaction.isExpense
+                            ? Colors.red
+                            : Colors.green,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),

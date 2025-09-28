@@ -32,7 +32,11 @@ class _YearMonthPickerState extends State<YearMonthPicker> {
 
   List<int> get _availableYears {
     final years = <int>[];
-    for (int year = widget.firstDate.year; year <= widget.lastDate.year; year++) {
+    for (
+      int year = widget.firstDate.year;
+      year <= widget.lastDate.year;
+      year++
+    ) {
       years.add(year);
     }
     return years;
@@ -161,12 +165,16 @@ class _YearMonthPickerState extends State<YearMonthPicker> {
                       child: Container(
                         alignment: Alignment.center,
                         child: Text(
-                          DateFormat('MMM').format(DateTime(_selectedYear, month)),
+                          DateFormat(
+                            'MMM',
+                          ).format(DateTime(_selectedYear, month)),
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: isSelected
                                 ? theme.colorScheme.onPrimary
                                 : theme.colorScheme.onSurfaceVariant,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                             fontSize: 12,
                           ),
                         ),
@@ -185,7 +193,9 @@ class _YearMonthPickerState extends State<YearMonthPicker> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                  color: theme.colorScheme.primaryContainer.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

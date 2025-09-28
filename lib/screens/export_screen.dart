@@ -29,7 +29,11 @@ class _ExportScreenState extends State<ExportScreen> {
     // Pre-select current month as default range
     final now = DateTime.now();
     _startDate = DateTime(now.year, now.month, 1);
-    _endDate = DateTime(now.year, now.month + 1, 0); // Last day of current month
+    _endDate = DateTime(
+      now.year,
+      now.month + 1,
+      0,
+    ); // Last day of current month
     _loadSummary();
   }
 
@@ -46,10 +50,8 @@ class _ExportScreenState extends State<ExportScreen> {
     });
 
     try {
-      final transactions = await DatabaseHelper.instance.getTransactionsByDateRange(
-        _startDate!,
-        _endDate!,
-      );
+      final transactions = await DatabaseHelper.instance
+          .getTransactionsByDateRange(_startDate!, _endDate!);
 
       double totalIncome = 0;
       double totalExpenses = 0;
@@ -67,7 +69,8 @@ class _ExportScreenState extends State<ExportScreen> {
         'totalIncome': totalIncome,
         'totalExpenses': totalExpenses,
         'netBalance': totalIncome - totalExpenses,
-        'dateRange': '${DateFormat('MMM dd, yyyy').format(_startDate!)} - ${DateFormat('MMM dd, yyyy').format(_endDate!)}',
+        'dateRange':
+            '${DateFormat('MMM dd, yyyy').format(_startDate!)} - ${DateFormat('MMM dd, yyyy').format(_endDate!)}',
       };
 
       setState(() {
@@ -77,7 +80,9 @@ class _ExportScreenState extends State<ExportScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.errorLoadingSummary(e.toString())),
+            content: Text(
+              AppLocalizations.of(context)!.errorLoadingSummary(e.toString()),
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -120,18 +125,21 @@ class _ExportScreenState extends State<ExportScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.csvExportedSuccessfully),
+            content: Text(
+              AppLocalizations.of(context)!.csvExportedSuccessfully,
+            ),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 3),
           ),
         );
       }
-
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.exportFailed(e.toString())),
+            content: Text(
+              AppLocalizations.of(context)!.exportFailed(e.toString()),
+            ),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 5),
           ),
@@ -150,9 +158,7 @@ class _ExportScreenState extends State<ExportScreen> {
     final currencyFormatter = NumberFormat.currency(symbol: '\$');
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.exportData),
-      ),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.exportData)),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -161,10 +167,12 @@ class _ExportScreenState extends State<ExportScreen> {
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                color: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.3,
+                ),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.2),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -172,10 +180,7 @@ class _ExportScreenState extends State<ExportScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.assessment,
-                        color: theme.colorScheme.primary,
-                      ),
+                      Icon(Icons.assessment, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
                         AppLocalizations.of(context)!.exportSummary,
@@ -209,21 +214,27 @@ class _ExportScreenState extends State<ExportScreen> {
                     const SizedBox(height: 8),
                     _SummaryRow(
                       label: AppLocalizations.of(context)!.totalIncome,
-                      value: currencyFormatter.format(_exportSummary!['totalIncome']),
+                      value: currencyFormatter.format(
+                        _exportSummary!['totalIncome'],
+                      ),
                       icon: Icons.trending_up,
                       valueColor: Colors.green,
                     ),
                     const SizedBox(height: 8),
                     _SummaryRow(
                       label: AppLocalizations.of(context)!.totalExpenses,
-                      value: currencyFormatter.format(_exportSummary!['totalExpenses']),
+                      value: currencyFormatter.format(
+                        _exportSummary!['totalExpenses'],
+                      ),
                       icon: Icons.trending_down,
                       valueColor: Colors.red,
                     ),
                     const SizedBox(height: 8),
                     _SummaryRow(
                       label: AppLocalizations.of(context)!.netBalance,
-                      value: currencyFormatter.format(_exportSummary!['netBalance']),
+                      value: currencyFormatter.format(
+                        _exportSummary!['netBalance'],
+                      ),
                       icon: Icons.account_balance,
                       valueColor: _exportSummary!['netBalance'] >= 0
                           ? Colors.blue
@@ -293,20 +304,28 @@ class _ExportScreenState extends State<ExportScreen> {
                                   horizontal: 16,
                                 ),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: theme.colorScheme.outline),
+                                  border: Border.all(
+                                    color: theme.colorScheme.outline,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       _startDate != null
-                                          ? DateFormat('MMM dd, yyyy').format(_startDate!)
-                                          : AppLocalizations.of(context)!.selectStartDate,
+                                          ? DateFormat(
+                                              'MMM dd, yyyy',
+                                            ).format(_startDate!)
+                                          : AppLocalizations.of(
+                                              context,
+                                            )!.selectStartDate,
                                       style: TextStyle(
                                         color: _startDate != null
                                             ? theme.colorScheme.onSurface
-                                            : theme.colorScheme.onSurface.withOpacity(0.6),
+                                            : theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.6),
                                       ),
                                     ),
                                     Icon(
@@ -357,20 +376,28 @@ class _ExportScreenState extends State<ExportScreen> {
                                   horizontal: 16,
                                 ),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: theme.colorScheme.outline),
+                                  border: Border.all(
+                                    color: theme.colorScheme.outline,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       _endDate != null
-                                          ? DateFormat('MMM dd, yyyy').format(_endDate!)
-                                          : AppLocalizations.of(context)!.selectEndDate,
+                                          ? DateFormat(
+                                              'MMM dd, yyyy',
+                                            ).format(_endDate!)
+                                          : AppLocalizations.of(
+                                              context,
+                                            )!.selectEndDate,
                                       style: TextStyle(
                                         color: _endDate != null
                                             ? theme.colorScheme.onSurface
-                                            : theme.colorScheme.onSurface.withOpacity(0.6),
+                                            : theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.6),
                                       ),
                                     ),
                                     Icon(
@@ -399,7 +426,8 @@ class _ExportScreenState extends State<ExportScreen> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: _startDate != null && _endDate != null && !_isExporting
+                  onPressed:
+                      _startDate != null && _endDate != null && !_isExporting
                       ? _exportCSV
                       : null,
                   icon: _isExporting
@@ -431,13 +459,14 @@ class _ExportScreenState extends State<ExportScreen> {
     );
   }
 
-  Future<void> _exportAndShareTransactions(DateTime startDate, DateTime endDate) async {
+  Future<void> _exportAndShareTransactions(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
     try {
       // Get transactions for date range
-      final transactions = await DatabaseHelper.instance.getTransactionsByDateRange(
-        startDate,
-        endDate,
-      );
+      final transactions = await DatabaseHelper.instance
+          .getTransactionsByDateRange(startDate, endDate);
 
       if (transactions.isEmpty) {
         throw Exception('No transactions found for selected date range');
@@ -454,7 +483,6 @@ class _ExportScreenState extends State<ExportScreen> {
 
       // Write to file and share
       await _writeAndShareCSV(csvContent, fileName);
-
     } catch (e) {
       throw Exception('Failed to export CSV: $e');
     }
@@ -503,7 +531,6 @@ class _ExportScreenState extends State<ExportScreen> {
         text: 'Expense Tracker Export - $fileName',
         subject: 'Financial Data Export',
       );
-
     } catch (e) {
       // Fallback to showing content in dialog if sharing fails
       if (mounted) {
@@ -514,7 +541,9 @@ class _ExportScreenState extends State<ExportScreen> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(AppLocalizations.of(context)!.failedToShareFile(e.toString())),
+                Text(
+                  AppLocalizations.of(context)!.failedToShareFile(e.toString()),
+                ),
                 const SizedBox(height: 16),
                 Text(AppLocalizations.of(context)!.csvContent),
                 const SizedBox(height: 8),
@@ -557,18 +586,9 @@ class _SummaryRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: Colors.grey[600],
-        ),
+        Icon(icon, size: 18, color: Colors.grey[600]),
         const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 14),
-          ),
-        ),
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
         Text(
           value,
           style: TextStyle(

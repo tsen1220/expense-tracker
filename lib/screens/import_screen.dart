@@ -42,9 +42,8 @@ class _ImportScreenState extends State<ImportScreen> {
                         const SizedBox(width: 8),
                         Text(
                           AppLocalizations.of(context)!.importInstructions,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -59,7 +58,9 @@ class _ImportScreenState extends State<ImportScreen> {
                     Text('• ${AppLocalizations.of(context)!.amountFormat}'),
                     Text('• ${AppLocalizations.of(context)!.typeFormat}'),
                     Text('• ${AppLocalizations.of(context)!.categoryFormat}'),
-                    Text('• ${AppLocalizations.of(context)!.descriptionFormat}'),
+                    Text(
+                      '• ${AppLocalizations.of(context)!.descriptionFormat}',
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       AppLocalizations.of(context)!.importNote,
@@ -91,9 +92,8 @@ class _ImportScreenState extends State<ImportScreen> {
                         const SizedBox(width: 8),
                         Text(
                           AppLocalizations.of(context)!.sampleCSVFormat,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const Spacer(),
                         TextButton.icon(
@@ -115,10 +115,7 @@ class _ImportScreenState extends State<ImportScreen> {
                         'Date,Title,Amount,Type,Category,Description\n'
                         '2024-01-15,Grocery Shopping,85.50,EXPENSE,Food,Weekly groceries\n'
                         '2024-01-15,Salary Payment,3000.00,INCOME,Salary,Monthly salary',
-                        style: TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(fontFamily: 'monospace', fontSize: 12),
                       ),
                     ),
                   ],
@@ -141,7 +138,11 @@ class _ImportScreenState extends State<ImportScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.upload_file),
-                  label: Text(_isImporting ? AppLocalizations.of(context)!.importing : AppLocalizations.of(context)!.selectCSVFile),
+                  label: Text(
+                    _isImporting
+                        ? AppLocalizations.of(context)!.importing
+                        : AppLocalizations.of(context)!.selectCSVFile,
+                  ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
@@ -176,13 +177,13 @@ class _ImportScreenState extends State<ImportScreen> {
                   hasErrors && !hasSuccess
                       ? Icons.error_outline
                       : hasSuccess
-                          ? Icons.check_circle_outline
-                          : Icons.warning_amber_outlined,
+                      ? Icons.check_circle_outline
+                      : Icons.warning_amber_outlined,
                   color: hasErrors && !hasSuccess
                       ? Theme.of(context).colorScheme.error
                       : hasSuccess
-                          ? Colors.green
-                          : Colors.orange,
+                      ? Colors.green
+                      : Colors.orange,
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -224,25 +225,31 @@ class _ImportScreenState extends State<ImportScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.errorContainer.withOpacity(0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.errorContainer.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.error.withOpacity(0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.error.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: result.errors
-                      .map((error) => Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: Text(
-                              '• $error',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Theme.of(context).colorScheme.error,
-                              ),
+                      .map(
+                        (error) => Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            '• $error',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.error,
                             ),
-                          ))
+                          ),
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -272,10 +279,7 @@ class _ImportScreenState extends State<ImportScreen> {
           Text(label),
           Text(
             value,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+            style: TextStyle(fontWeight: FontWeight.bold, color: color),
           ),
         ],
       ),
@@ -299,7 +303,7 @@ class _ImportScreenState extends State<ImportScreen> {
         // Show snackbar for quick feedback
         if (mounted) {
           final localizations = AppLocalizations.of(context)!;
-        final message = result.hasSuccess
+          final message = result.hasSuccess
               ? localizations.importSuccessMessage(result.importedCount)
               : localizations.importFailedMessage(result.errorCount);
 
@@ -317,7 +321,9 @@ class _ImportScreenState extends State<ImportScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.importFailedWithError(e.toString())),
+            content: Text(
+              AppLocalizations.of(context)!.importFailedWithError(e.toString()),
+            ),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

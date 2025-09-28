@@ -8,7 +8,8 @@ class CategoryManagementScreen extends StatefulWidget {
   const CategoryManagementScreen({super.key});
 
   @override
-  State<CategoryManagementScreen> createState() => _CategoryManagementScreenState();
+  State<CategoryManagementScreen> createState() =>
+      _CategoryManagementScreenState();
 }
 
 class _CategoryManagementScreenState extends State<CategoryManagementScreen>
@@ -33,13 +34,13 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
 
   Future<void> _loadCategories() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final expenseCategories = await DatabaseHelper.instance
           .getCategoriesByType(isIncomeCategory: false);
       final incomeCategories = await DatabaseHelper.instance
           .getCategoriesByType(isIncomeCategory: true);
-      
+
       setState(() {
         _expenseCategories = expenseCategories;
         _incomeCategories = incomeCategories;
@@ -49,7 +50,13 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingCategories(e.toString()))),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              )!.errorLoadingCategories(e.toString()),
+            ),
+          ),
         );
       }
     }
@@ -61,7 +68,9 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
       builder: (context) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.delete),
         content: Text(
-          AppLocalizations.of(context)!.deleteConfirmCategory(category.displayName),
+          AppLocalizations.of(
+            context,
+          )!.deleteConfirmCategory(category.displayName),
         ),
         actions: [
           TextButton(
@@ -82,7 +91,11 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
         await _loadCategories();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.categoryDeletedSuccess)),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.categoryDeletedSuccess,
+              ),
+            ),
           );
         }
       } catch (e) {
@@ -90,13 +103,15 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
           String errorMessage;
           if (e.toString().contains('FOREIGN KEY constraint failed') ||
               e.toString().contains('foreign key constraint')) {
-            errorMessage = AppLocalizations.of(context)!.categoryInUseCannotDelete;
+            errorMessage = AppLocalizations.of(
+              context,
+            )!.categoryInUseCannotDelete;
           } else {
             errorMessage = AppLocalizations.of(context)!.errorsEncountered;
           }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMessage)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(errorMessage)));
         }
       }
     }
@@ -104,9 +119,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
 
   Widget _buildCategoryList(List<Category> categories) {
     if (categories.isEmpty) {
-      return Center(
-        child: Text(AppLocalizations.of(context)!.noCategoriesYet),
-      );
+      return Center(child: Text(AppLocalizations.of(context)!.noCategoriesYet));
     }
 
     return ListView.builder(
@@ -120,17 +133,16 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: category.color.withOpacity(0.2),
+                color: category.color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                category.icon,
-                color: category.color,
-              ),
+              child: Icon(category.icon, color: category.color),
             ),
             title: Text(category.displayName),
             subtitle: Text(
-              category.isDefault ? AppLocalizations.of(context)!.defaultCategory : AppLocalizations.of(context)!.customCategory,
+              category.isDefault
+                  ? AppLocalizations.of(context)!.defaultCategory
+                  : AppLocalizations.of(context)!.customCategory,
               style: TextStyle(
                 color: category.isDefault ? Colors.grey : Colors.blue,
                 fontSize: 12,
@@ -156,7 +168,10 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
                           children: [
                             const Icon(Icons.delete, color: Colors.red),
                             const SizedBox(width: 8),
-                            Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.red)),
+                            Text(
+                              AppLocalizations.of(context)!.delete,
+                              style: const TextStyle(color: Colors.red),
+                            ),
                           ],
                         ),
                       ),
@@ -217,9 +232,8 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
           final result = await Navigator.push<bool>(
             context,
             MaterialPageRoute(
-              builder: (context) => AddCategoryScreen(
-                isIncomeCategory: isIncomeCategory,
-              ),
+              builder: (context) =>
+                  AddCategoryScreen(isIncomeCategory: isIncomeCategory),
             ),
           );
           if (result == true) {

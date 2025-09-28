@@ -258,7 +258,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                           ),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.grey.withOpacity(0.5),
+                              color: Colors.grey.withValues(alpha: 0.5),
                             ),
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -548,7 +548,9 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: transaction.category.color.withOpacity(0.2),
+                        color: transaction.category.color.withValues(
+                          alpha: 0.2,
+                        ),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Icon(
@@ -857,7 +859,9 @@ class _DatePickerPopupState extends State<_DatePickerPopup> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                  color: theme.colorScheme.primaryContainer.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

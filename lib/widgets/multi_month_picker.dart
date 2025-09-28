@@ -50,7 +50,7 @@ class _MultiMonthPickerState extends State<MultiMonthPicker> {
     final latest = _latestAvailable;
 
     while (current.isBefore(latest) ||
-           (current.year == latest.year && current.month == latest.month)) {
+        (current.year == latest.year && current.month == latest.month)) {
       months.add(DateTime(current.year, current.month));
 
       if (current.month == 12) {
@@ -64,8 +64,10 @@ class _MultiMonthPickerState extends State<MultiMonthPicker> {
   }
 
   bool _isMonthSelected(DateTime month) {
-    return _selectedMonths.any((selected) =>
-        selected.year == month.year && selected.month == month.month);
+    return _selectedMonths.any(
+      (selected) =>
+          selected.year == month.year && selected.month == month.month,
+    );
   }
 
   void _toggleMonth(DateTime month) {
@@ -73,8 +75,10 @@ class _MultiMonthPickerState extends State<MultiMonthPicker> {
       final isSelected = _isMonthSelected(month);
 
       if (isSelected) {
-        _selectedMonths.removeWhere((selected) =>
-            selected.year == month.year && selected.month == month.month);
+        _selectedMonths.removeWhere(
+          (selected) =>
+              selected.year == month.year && selected.month == month.month,
+        );
       } else {
         _selectedMonths.add(month);
       }
@@ -136,7 +140,7 @@ class _MultiMonthPickerState extends State<MultiMonthPicker> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+            color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -216,10 +220,7 @@ class _MultiMonthPickerState extends State<MultiMonthPicker> {
                       const SizedBox(height: 16),
                       Text(
                         'No months available',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                     ],
                   ),
@@ -229,12 +230,13 @@ class _MultiMonthPickerState extends State<MultiMonthPicker> {
                   child: GridView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 2.5,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 2.5,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
                     itemCount: availableMonths.length,
                     itemBuilder: (context, index) {
                       final month = availableMonths[index];
@@ -284,7 +286,7 @@ class _MonthTile extends StatelessWidget {
             border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary
-                  : theme.colorScheme.outline.withOpacity(0.3),
+                  : theme.colorScheme.outline.withValues(alpha: 0.3),
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(12),
@@ -305,8 +307,10 @@ class _MonthTile extends StatelessWidget {
                 month.year.toString(),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: isSelected
-                      ? theme.colorScheme.onPrimaryContainer.withOpacity(0.8)
-                      : theme.colorScheme.onSurface.withOpacity(0.6),
+                      ? theme.colorScheme.onPrimaryContainer.withValues(
+                          alpha: 0.8,
+                        )
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
               if (isSelected)
@@ -359,12 +363,12 @@ class _QuickActionChip extends StatelessWidget {
       ),
       onPressed: onTap,
       backgroundColor: isDestructive
-          ? theme.colorScheme.errorContainer.withOpacity(0.3)
-          : theme.colorScheme.primaryContainer.withOpacity(0.3),
+          ? theme.colorScheme.errorContainer.withValues(alpha: 0.3)
+          : theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
       side: BorderSide(
         color: isDestructive
-            ? theme.colorScheme.error.withOpacity(0.5)
-            : theme.colorScheme.primary.withOpacity(0.5),
+            ? theme.colorScheme.error.withValues(alpha: 0.5)
+            : theme.colorScheme.primary.withValues(alpha: 0.5),
       ),
     );
   }

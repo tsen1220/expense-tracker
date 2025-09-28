@@ -20,7 +20,7 @@ class AddCategoryScreen extends StatefulWidget {
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
-  
+
   IconData _selectedIcon = Icons.category;
   Color _selectedColor = Colors.blue;
   bool _isLoading = false;
@@ -104,16 +104,23 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     try {
       // Check if category with same display name already exists (only for new categories)
       if (widget.category == null) {
-        final existingCategories = await DatabaseHelper.instance.getCategoriesByType(
-          isIncomeCategory: widget.isIncomeCategory,
-        );
+        final existingCategories = await DatabaseHelper.instance
+            .getCategoriesByType(isIncomeCategory: widget.isIncomeCategory);
 
-        final duplicateExists = existingCategories.any((cat) => cat.displayName.toLowerCase() == _displayNameController.text.toLowerCase());
+        final duplicateExists = existingCategories.any(
+          (cat) =>
+              cat.displayName.toLowerCase() ==
+              _displayNameController.text.toLowerCase(),
+        );
         if (duplicateExists) {
           setState(() => _isLoading = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context)!.categoryNameAlreadyExists)),
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)!.categoryNameAlreadyExists,
+                ),
+              ),
             );
           }
           return;
@@ -141,14 +148,20 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         String errorMessage;
-        if (e.toString().contains('Category with this display name already exists')) {
-          errorMessage = AppLocalizations.of(context)!.categoryNameAlreadyExists;
+        if (e.toString().contains(
+          'Category with this display name already exists',
+        )) {
+          errorMessage = AppLocalizations.of(
+            context,
+          )!.categoryNameAlreadyExists;
         } else {
-          errorMessage = AppLocalizations.of(context)!.errorSavingCategory(e.toString());
+          errorMessage = AppLocalizations.of(
+            context,
+          )!.errorSavingCategory(e.toString());
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
       }
     }
   }
@@ -225,7 +238,9 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                   decoration: BoxDecoration(
                     color: color,
                     border: Border.all(
-                      color: color == _selectedColor ? Colors.black : Colors.grey,
+                      color: color == _selectedColor
+                          ? Colors.black
+                          : Colors.grey,
                       width: color == _selectedColor ? 3 : 1,
                     ),
                     borderRadius: BorderRadius.circular(8),
@@ -251,10 +266,14 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.category != null;
-    
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? AppLocalizations.of(context)!.editCategory : AppLocalizations.of(context)!.addCategory),
+        title: Text(
+          isEditing
+              ? AppLocalizations.of(context)!.editCategory
+              : AppLocalizations.of(context)!.addCategory,
+        ),
         actions: [
           if (_isLoading)
             const Center(
@@ -270,7 +289,11 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
           else
             TextButton(
               onPressed: _saveCategory,
-              child: Text(isEditing ? AppLocalizations.of(context)!.update : AppLocalizations.of(context)!.save),
+              child: Text(
+                isEditing
+                    ? AppLocalizations.of(context)!.update
+                    : AppLocalizations.of(context)!.save,
+              ),
             ),
         ],
       ),
@@ -296,7 +319,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                           width: 50,
                           height: 50,
                           decoration: BoxDecoration(
-                            color: _selectedColor.withOpacity(0.2),
+                            color: _selectedColor.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
@@ -313,11 +336,19 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                               Text(
                                 _displayNameController.text.isNotEmpty
                                     ? _displayNameController.text
-                                    : AppLocalizations.of(context)!.categoryName,
+                                    : AppLocalizations.of(
+                                        context,
+                                      )!.categoryName,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               Text(
-                                widget.isIncomeCategory ? AppLocalizations.of(context)!.incomeCategory : AppLocalizations.of(context)!.expenseCategory,
+                                widget.isIncomeCategory
+                                    ? AppLocalizations.of(
+                                        context,
+                                      )!.incomeCategory
+                                    : AppLocalizations.of(
+                                        context,
+                                      )!.expenseCategory,
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],

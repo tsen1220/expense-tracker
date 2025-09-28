@@ -44,9 +44,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
       initialIndex: _selectedType == TransactionType.expense ? 0 : 1,
     );
     _tabController.addListener(_onTabChanged);
-    
+
     _loadCategories();
-    
+
     if (widget.transaction != null) {
       _titleController.text = widget.transaction!.title;
       _amountController.text = widget.transaction!.amount.toString();
@@ -108,7 +108,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.errorLoadingCategories(e.toString()))),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              )!.errorLoadingCategories(e.toString()),
+            ),
+          ),
         );
       }
     }
@@ -121,7 +127,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
       firstDate: DateTime(2020),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-    
+
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -131,10 +137,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
 
   Future<void> _saveTransaction() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     if (_selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseSelectCategory)),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.pleaseSelectCategory),
+        ),
       );
       return;
     }
@@ -148,8 +156,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
         amount: double.parse(_amountController.text),
         category: _selectedCategory!,
         date: _selectedDate,
-        description: _descriptionController.text.isEmpty 
-            ? null 
+        description: _descriptionController.text.isEmpty
+            ? null
             : _descriptionController.text,
         type: _selectedType,
       );
@@ -167,7 +175,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.errorSavingTransaction(e.toString()))),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(
+                context,
+              )!.errorSavingTransaction(e.toString()),
+            ),
+          ),
         );
       }
     }
@@ -182,10 +196,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.transaction != null;
-    
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? AppLocalizations.of(context)!.editTransaction : AppLocalizations.of(context)!.addTransaction),
+        title: Text(
+          isEditing
+              ? AppLocalizations.of(context)!.editTransaction
+              : AppLocalizations.of(context)!.addTransaction,
+        ),
         actions: [
           if (_isLoading)
             const Center(
@@ -201,16 +219,28 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
           else
             TextButton(
               onPressed: _saveTransaction,
-              child: Text(isEditing ? AppLocalizations.of(context)!.update : AppLocalizations.of(context)!.save),
+              child: Text(
+                isEditing
+                    ? AppLocalizations.of(context)!.update
+                    : AppLocalizations.of(context)!.save,
+              ),
             ),
         ],
-        bottom: isEditing ? null : TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: AppLocalizations.of(context)!.expense, icon: const Icon(Icons.trending_down)),
-            Tab(text: AppLocalizations.of(context)!.income, icon: const Icon(Icons.trending_up)),
-          ],
-        ),
+        bottom: isEditing
+            ? null
+            : TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(
+                    text: AppLocalizations.of(context)!.expense,
+                    icon: const Icon(Icons.trending_down),
+                  ),
+                  Tab(
+                    text: AppLocalizations.of(context)!.income,
+                    icon: const Icon(Icons.trending_up),
+                  ),
+                ],
+              ),
       ),
       body: Form(
         key: _formKey,
@@ -244,7 +274,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
               ),
               const SizedBox(height: 16),
             ],
-            
+
             TextFormField(
               controller: _titleController,
               decoration: InputDecoration(
@@ -261,7 +291,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
               },
             ),
             const SizedBox(height: 16),
-            
+
             TextFormField(
               controller: _amountController,
               decoration: InputDecoration(
@@ -270,7 +300,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.attach_money),
               ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return AppLocalizations.of(context)!.pleaseEnterAmount;
@@ -283,7 +315,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
               },
             ),
             const SizedBox(height: 16),
-            
+
             DropdownButtonFormField<Category>(
               value: _selectedCategory,
               decoration: InputDecoration(
@@ -302,7 +334,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: category.color.withOpacity(0.2),
+                          color: category.color.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Icon(
@@ -330,7 +362,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
               },
             ),
             const SizedBox(height: 16),
-            
+
             InkWell(
               onTap: _selectDate,
               child: InputDecorator(
@@ -339,13 +371,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.calendar_today),
                 ),
-                child: Text(
-                  DateFormat.yMMMd().format(_selectedDate),
-                ),
+                child: Text(DateFormat.yMMMd().format(_selectedDate)),
               ),
             ),
             const SizedBox(height: 16),
-            
+
             TextFormField(
               controller: _descriptionController,
               decoration: InputDecoration(
