@@ -22,7 +22,7 @@ class Category {
       'id': id,
       'display_name': displayName,
       'icon_code': icon.codePoint,
-      'color_value': color.value,
+      'color_value': color.toARGB32(),
       'is_default': isDefault ? 1 : 0,
       'is_income_category': isIncomeCategory ? 1 : 0,
     };
@@ -60,7 +60,9 @@ class Category {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is Category && other.id == id && other.displayName == displayName;
+    return other is Category &&
+        other.id == id &&
+        other.displayName == displayName;
   }
 
   @override
