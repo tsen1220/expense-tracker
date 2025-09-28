@@ -317,7 +317,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen>
             const SizedBox(height: 16),
 
             DropdownButtonFormField<Category>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)!.category,
                 border: const OutlineInputBorder(),
