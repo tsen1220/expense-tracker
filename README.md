@@ -9,6 +9,17 @@ A comprehensive cross-platform personal finance management application built wit
 - Dart SDK ^3.9.0
 - Supported platforms: iOS, Android, Windows, macOS, Linux
 
+### Main Package Versions
+- **sqflite**: ^2.3.0 - SQLite database implementation
+- **fl_chart**: ^0.66.0 - Beautiful charts and graphs
+- **provider**: ^6.1.2 - State management
+- **intl**: ^0.20.2 - Internationalization and localization
+- **csv**: ^6.0.0 - CSV file handling
+- **share_plus**: ^10.1.2 - Cross-platform sharing
+- **path_provider**: ^2.1.4 - File system path access
+- **file_picker**: ^8.1.4 - File picker functionality
+- **cupertino_icons**: ^1.0.8 - iOS style icons
+
 ### Installation
 
 1. **Clone the repository**
@@ -173,6 +184,7 @@ lib/
 │   └── language_provider.dart            # Language state management
 ├── services/
 │   ├── theme_service.dart                # Theme configuration service
+│   ├── language_service.dart             # Language configuration service
 │   ├── csv_export_service.dart           # CSV export service
 │   └── csv_import_service.dart           # CSV import service
 └── l10n/
@@ -198,6 +210,35 @@ lib/
 - Language preferences (English/Traditional Chinese)
 - Persistent storage of user choices
 
+## 🔧 Technical Implementation Details
+
+### Database Constraints & Error Handling
+
+#### Category Model Constraints
+- **Unique Constraint**: `UNIQUE(display_name, is_income_category)` prevents duplicate category names within the same type
+- **Cross-Type Flexibility**: Categories can have identical display names across income/expense types
+- **No Internal Names**: Simplified model using only user-facing display names
+
+#### Error Handling Pattern
+```dart
+try {
+  await DatabaseHelper.instance.updateCategory(category);
+} catch (e) {
+  if (e.toString().contains('Category with this display name already exists')) {
+    // Display localized duplicate name error
+    showSnackBar(AppLocalizations.of(context)!.categoryNameAlreadyExists);
+  } else {
+    // Display generic error message
+    showSnackBar(AppLocalizations.of(context)!.errorSavingCategory);
+  }
+}
+```
+
+#### Key Design Decisions
+- **Exception-Based Validation**: Database layer throws exceptions for constraint violations
+- **UI Error Translation**: User interface catches exceptions and displays appropriate localized messages
+- **Fail-Fast Approach**: Validation occurs at the database level for data integrity
+
 ## 🧪 Testing
 
 ### Test Configuration
@@ -211,53 +252,10 @@ flutter test                    # Run all tests
 flutter test test/widget_test.dart  # Run specific test file
 ```
 
-## 🔧 Key Implementation Details
-
-### Database Best Practices
-- Explicit column selection with aliases in JOIN queries
-- Foreign key relationships between transactions and categories
-- onCreate pattern without migrations for simplicity
-
-### UI/UX Considerations
-- Automatic category selection in dropdowns
-- `MainAxisSize.min` for constrained Row widgets
-- PopupMenuButton for edit/delete actions in transaction list
-- Tabbed interface for income/expense type selection
-
-### State Management
-- Provider pattern with ChangeNotifier for reactive updates
-- Automatic theme persistence to SQLite database
-- Real-time UI updates when preferences change
-
-## 📋 Future Enhancements
-
-- [ ] Budget setting and tracking
-- [ ] Recurring transactions
-- [ ] Additional chart types
-- [ ] Cloud synchronization
-- [ ] Multi-currency support
-- [ ] Bill splitting features
-- [ ] PDF/Excel export formats
-- [ ] Advanced reporting
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. Before contributing:
-
-1. Ensure code follows project coding standards
-2. Add tests for new features
-3. Update documentation as needed
-4. Make sure all existing tests pass
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Flutter team for the excellent framework
-- Material Design for UI guidelines
-- Open source community for amazing packages
 
 ---
 
@@ -276,7 +274,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   <strong>Home Dashboard</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Add Transaction</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Category Management</strong>
 </div>
 
-### 🔧 Data Management & Settings
+### 🔧 Data Management
 <div align="center">
   <img src="screenshots/data_import.png" width="250" alt="Data Import">
   <img src="screenshots/data_export.png" width="250" alt="Data Export">

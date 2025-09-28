@@ -956,6 +956,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to delete category: {error}'**
   String failedToDeleteCategoryError(String error);
+
+  /// No description provided for @categoryNameAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'A category with this name already exists'**
+  String get categoryNameAlreadyExists;
 }
 
 class _AppLocalizationsDelegate

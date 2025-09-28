@@ -106,7 +106,6 @@ class CSVImportService {
     final categoryMap = <String, Category>{};
     for (final category in categories) {
       categoryMap[category.displayName.toLowerCase()] = category;
-      categoryMap[category.name.toLowerCase()] = category;
     }
 
     // Create header index map

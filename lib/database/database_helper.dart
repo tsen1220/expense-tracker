@@ -38,13 +38,12 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE $_categoriesTable (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
         display_name TEXT NOT NULL,
         icon_code INTEGER NOT NULL,
         color_value INTEGER NOT NULL,
         is_default INTEGER NOT NULL DEFAULT 0,
         is_income_category INTEGER NOT NULL DEFAULT 0,
-        UNIQUE(name, is_income_category)
+        UNIQUE(display_name, is_income_category)
       )
     ''');
 
@@ -61,8 +60,6 @@ class DatabaseHelper {
         FOREIGN KEY (category_id) REFERENCES $_categoriesTable (id)
       )
     ''');
-
-
 
     // Create theme preferences table
     await db.execute('''
@@ -91,7 +88,6 @@ class DatabaseHelper {
     // Insert default language preference
     await _insertDefaultLanguagePreference(db);
   }
-
 
   Future _insertDefaultCategories(Database db) async {
     for (Category category in DefaultCategories.allDefaultCategories) {
@@ -126,48 +122,58 @@ class DatabaseHelper {
     List<Map<String, dynamic>> maps = await db.rawQuery('''
       SELECT
         t.id, t.title, t.amount, t.category_id, t.date, t.description, t.type,
-        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+        c.id as category_table_id, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
       FROM $_transactionsTable t
       JOIN $_categoriesTable c ON t.category_id = c.id
       ORDER BY t.date DESC
     ''');
-    
+
     return List.generate(maps.length, (i) {
       Category category = Category.fromMap(maps[i]);
       return model.Transaction.fromMap(maps[i], category);
     });
   }
 
-  Future<List<model.Transaction>> getTransactionsByType(model.TransactionType type) async {
+  Future<List<model.Transaction>> getTransactionsByType(
+    model.TransactionType type,
+  ) async {
     Database db = await database;
-    List<Map<String, dynamic>> maps = await db.rawQuery('''
+    List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
       SELECT
         t.id, t.title, t.amount, t.category_id, t.date, t.description, t.type,
-        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+        c.id as category_table_id, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
       FROM $_transactionsTable t
       JOIN $_categoriesTable c ON t.category_id = c.id
       WHERE t.type = ?
       ORDER BY t.date DESC
-    ''', [type.name]);
-    
+    ''',
+      [type.name],
+    );
+
     return List.generate(maps.length, (i) {
       Category category = Category.fromMap(maps[i]);
       return model.Transaction.fromMap(maps[i], category);
     });
   }
 
-  Future<List<model.Transaction>> getTransactionsByCategory(Category category) async {
+  Future<List<model.Transaction>> getTransactionsByCategory(
+    Category category,
+  ) async {
     Database db = await database;
-    List<Map<String, dynamic>> maps = await db.rawQuery('''
+    List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
       SELECT
         t.id, t.title, t.amount, t.category_id, t.date, t.description, t.type,
-        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+        c.id as category_table_id, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
       FROM $_transactionsTable t
       JOIN $_categoriesTable c ON t.category_id = c.id
       WHERE t.category_id = ?
       ORDER BY t.date DESC
-    ''', [category.id]);
-    
+    ''',
+      [category.id],
+    );
+
     return List.generate(maps.length, (i) {
       Category cat = Category.fromMap(maps[i]);
       return model.Transaction.fromMap(maps[i], cat);
@@ -176,41 +182,46 @@ class DatabaseHelper {
 
   Future<List<model.Transaction>> getTransactionsByDateRange(
     DateTime start,
-    DateTime end,
-    {model.TransactionType? type}
-  ) async {
+    DateTime end, {
+    model.TransactionType? type,
+  }) async {
     Database db = await database;
-    
+
     String whereClause = 't.date >= ? AND t.date <= ?';
-    List<dynamic> whereArgs = [start.millisecondsSinceEpoch, end.millisecondsSinceEpoch];
-    
+    List<dynamic> whereArgs = [
+      start.millisecondsSinceEpoch,
+      end.millisecondsSinceEpoch,
+    ];
+
     if (type != null) {
       whereClause += ' AND t.type = ?';
       whereArgs.add(type.name);
     }
-    
+
     List<Map<String, dynamic>> maps = await db.rawQuery('''
       SELECT
         t.id, t.title, t.amount, t.category_id, t.date, t.description, t.type,
-        c.id as category_table_id, c.name, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
+        c.id as category_table_id, c.display_name, c.icon_code, c.color_value, c.is_default, c.is_income_category
       FROM $_transactionsTable t
       JOIN $_categoriesTable c ON t.category_id = c.id
       WHERE $whereClause
       ORDER BY t.date DESC
     ''', whereArgs);
-    
+
     return List.generate(maps.length, (i) {
       Category category = Category.fromMap(maps[i]);
       return model.Transaction.fromMap(maps[i], category);
     });
   }
 
-  Future<Map<Category, double>> getCategoryTotals({model.TransactionType? type}) async {
+  Future<Map<Category, double>> getCategoryTotals({
+    model.TransactionType? type,
+  }) async {
     Database db = await database;
-    
+
     String whereClause = type != null ? 'WHERE t.type = ?' : '';
     List<dynamic> whereArgs = type != null ? [type.name] : [];
-    
+
     List<Map<String, dynamic>> result = await db.rawQuery('''
       SELECT c.*, SUM(t.amount) as total FROM $_transactionsTable t
       JOIN $_categoriesTable c ON t.category_id = c.id
@@ -240,7 +251,11 @@ class DatabaseHelper {
 
   Future<int> deleteTransaction(int id) async {
     Database db = await database;
-    return await db.delete(_transactionsTable, where: 'id = ?', whereArgs: [id]);
+    return await db.delete(
+      _transactionsTable,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<double> getTotalByType(model.TransactionType type) async {
@@ -267,13 +282,16 @@ class DatabaseHelper {
   }
 
   Future<List<model.Transaction>> getTransactionsByMonth(
-    int year, 
-    int month, 
-    {model.TransactionType? type}
-  ) async {
+    int year,
+    int month, {
+    model.TransactionType? type,
+  }) async {
     final startOfMonth = DateTime(year, month, 1).millisecondsSinceEpoch;
-    final endOfMonth = DateTime(year, month + 1, 1)
-        .subtract(const Duration(days: 1)).millisecondsSinceEpoch;
+    final endOfMonth = DateTime(
+      year,
+      month + 1,
+      1,
+    ).subtract(const Duration(days: 1)).millisecondsSinceEpoch;
 
     return getTransactionsByDateRange(
       DateTime.fromMillisecondsSinceEpoch(startOfMonth),
@@ -283,21 +301,27 @@ class DatabaseHelper {
   }
 
   Future<double> getTotalByMonth(
-    int year, 
-    int month, 
-    model.TransactionType type
+    int year,
+    int month,
+    model.TransactionType type,
   ) async {
     Database db = await database;
-    
-    final startOfMonth = DateTime(year, month, 1).millisecondsSinceEpoch;
-    final endOfMonth = DateTime(year, month + 1, 1)
-        .subtract(const Duration(days: 1)).millisecondsSinceEpoch;
 
-    List<Map<String, dynamic>> result = await db.rawQuery('''
+    final startOfMonth = DateTime(year, month, 1).millisecondsSinceEpoch;
+    final endOfMonth = DateTime(
+      year,
+      month + 1,
+      1,
+    ).subtract(const Duration(days: 1)).millisecondsSinceEpoch;
+
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      '''
       SELECT SUM(amount) as total FROM $_transactionsTable 
       WHERE date >= ? AND date <= ? AND type = ?
-    ''', [startOfMonth, endOfMonth, type.name]);
-    
+    ''',
+      [startOfMonth, endOfMonth, type.name],
+    );
+
     return result[0]['total'] ?? 0.0;
   }
 
@@ -316,7 +340,9 @@ class DatabaseHelper {
     return List.generate(maps.length, (i) => Category.fromMap(maps[i]));
   }
 
-  Future<List<Category>> getCategoriesByType({bool isIncomeCategory = false}) async {
+  Future<List<Category>> getCategoriesByType({
+    bool isIncomeCategory = false,
+  }) async {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.query(
       _categoriesTable,
@@ -340,6 +366,22 @@ class DatabaseHelper {
 
   Future<int> updateCategory(Category category) async {
     Database db = await database;
+
+    // Check if another category with same display_name and is_income_category exists
+    List<Map<String, dynamic>> existingCategories = await db.query(
+      _categoriesTable,
+      where: 'display_name = ? AND is_income_category = ? AND id != ?',
+      whereArgs: [
+        category.displayName,
+        category.isIncomeCategory ? 1 : 0,
+        category.id,
+      ],
+    );
+
+    if (existingCategories.isNotEmpty) {
+      throw Exception('Category with this display name already exists in the same type');
+    }
+
     return await db.update(
       _categoriesTable,
       category.toMap(),
@@ -354,8 +396,6 @@ class DatabaseHelper {
     // due to foreign key constraint
     return await db.delete(_categoriesTable, where: 'id = ?', whereArgs: [id]);
   }
-
-
 
   // Theme preference methods
   Future<ThemePreference> getThemePreference() async {
@@ -391,9 +431,10 @@ class DatabaseHelper {
     await db.delete(_themePreferencesTable);
 
     // Insert the new preference
-    return await db.insert(_themePreferencesTable, themePreference.copyWith(
-      lastUpdated: DateTime.now(),
-    ).toMap());
+    return await db.insert(
+      _themePreferencesTable,
+      themePreference.copyWith(lastUpdated: DateTime.now()).toMap(),
+    );
   }
 
   Future<void> setThemeMode(AppThemeMode themeMode) async {
@@ -426,21 +467,29 @@ class DatabaseHelper {
     }
   }
 
-  Future<int> insertLanguagePreference(LanguagePreference languagePreference) async {
+  Future<int> insertLanguagePreference(
+    LanguagePreference languagePreference,
+  ) async {
     Database db = await database;
-    return await db.insert(_languagePreferencesTable, languagePreference.toMap());
+    return await db.insert(
+      _languagePreferencesTable,
+      languagePreference.toMap(),
+    );
   }
 
-  Future<int> updateLanguagePreference(LanguagePreference languagePreference) async {
+  Future<int> updateLanguagePreference(
+    LanguagePreference languagePreference,
+  ) async {
     Database db = await database;
 
     // Clear all existing preferences first (we only want one)
     await db.delete(_languagePreferencesTable);
 
     // Insert the new preference
-    return await db.insert(_languagePreferencesTable, languagePreference.copyWith(
-      lastUpdated: DateTime.now(),
-    ).toMap());
+    return await db.insert(
+      _languagePreferencesTable,
+      languagePreference.copyWith(lastUpdated: DateTime.now()).toMap(),
+    );
   }
 
   Future<void> setLanguage(AppLanguage language) async {

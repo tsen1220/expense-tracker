@@ -469,4 +469,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String failedToDeleteCategoryError(String error) {
     return 'Failed to delete category: $error';
   }
+
+  @override
+  String get categoryNameAlreadyExists =>
+      'A category with this name already exists';
 }

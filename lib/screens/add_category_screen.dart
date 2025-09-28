@@ -19,7 +19,6 @@ class AddCategoryScreen extends StatefulWidget {
 
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _displayNameController = TextEditingController();
   
   IconData _selectedIcon = Icons.category;
@@ -85,7 +84,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   void initState() {
     super.initState();
     if (widget.category != null) {
-      _nameController.text = widget.category!.name;
       _displayNameController.text = widget.category!.displayName;
       _selectedIcon = widget.category!.icon;
       _selectedColor = widget.category!.color;
@@ -94,7 +92,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _displayNameController.dispose();
     super.dispose();
   }
@@ -105,9 +102,26 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // Check if category with same display name already exists (only for new categories)
+      if (widget.category == null) {
+        final existingCategories = await DatabaseHelper.instance.getCategoriesByType(
+          isIncomeCategory: widget.isIncomeCategory,
+        );
+
+        final duplicateExists = existingCategories.any((cat) => cat.displayName.toLowerCase() == _displayNameController.text.toLowerCase());
+        if (duplicateExists) {
+          setState(() => _isLoading = false);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(AppLocalizations.of(context)!.categoryNameAlreadyExists)),
+            );
+          }
+          return;
+        }
+      }
+
       final category = Category(
         id: widget.category?.id,
-        name: _nameController.text.toLowerCase().replaceAll(' ', '_'),
         displayName: _displayNameController.text,
         icon: _selectedIcon,
         color: _selectedColor,
@@ -126,8 +140,14 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
+        String errorMessage;
+        if (e.toString().contains('Category with this display name already exists')) {
+          errorMessage = AppLocalizations.of(context)!.categoryNameAlreadyExists;
+        } else {
+          errorMessage = AppLocalizations.of(context)!.errorSavingCategory(e.toString());
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.errorSavingCategory(e.toString()))),
+          SnackBar(content: Text(errorMessage)),
         );
       }
     }
@@ -324,16 +344,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                 return null;
               },
               onChanged: (value) => setState(() {}),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.internalName,
-                hintText: AppLocalizations.of(context)!.internalNameHint,
-                border: const OutlineInputBorder(),
-                helperText: AppLocalizations.of(context)!.internalNameHelper,
-              ),
             ),
             const SizedBox(height: 24),
             Row(

@@ -613,5 +613,9 @@
         "type": "String"
       }
     }
+  },
+  "categoryNameAlreadyExists": "A category with this name already exists",
+  "@@categoryNameAlreadyExists": {
+    "description": "Error message when category name already exists"
   }
 }

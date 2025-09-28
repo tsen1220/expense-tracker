@@ -142,5 +142,6 @@
   "defaultCategory": "預設分類",
   "customCategory": "自訂分類",
   "deleteConfirmCategory": "確定要刪除「{categoryName}」嗎？",
-  "failedToDeleteCategoryError": "刪除分類失敗：{error}"
+  "failedToDeleteCategoryError": "刪除分類失敗：{error}",
+  "categoryNameAlreadyExists": "此分類名稱已存在"
 }

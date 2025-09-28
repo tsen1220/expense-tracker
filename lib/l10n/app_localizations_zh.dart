@@ -466,6 +466,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String failedToDeleteCategoryError(String error) {
     return '刪除分類失敗：$error';
   }
+
+  @override
+  String get categoryNameAlreadyExists => '此分類名稱已存在';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -930,4 +933,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String failedToDeleteCategoryError(String error) {
     return '刪除分類失敗：$error';
   }
+
+  @override
+  String get categoryNameAlreadyExists => '此分類名稱已存在';
 }
