@@ -473,4 +473,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get categoryNameAlreadyExists =>
       'A category with this name already exists';
+
+  @override
+  String get categoryInUseCannotDelete =>
+      'Cannot delete category as it is being used by transactions';
 }

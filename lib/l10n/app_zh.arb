@@ -143,5 +143,6 @@
   "customCategory": "自訂分類",
   "deleteConfirmCategory": "確定要刪除「{categoryName}」嗎？",
   "failedToDeleteCategoryError": "刪除分類失敗：{error}",
-  "categoryNameAlreadyExists": "此分類名稱已存在"
+  "categoryNameAlreadyExists": "此分類名稱已存在",
+  "categoryInUseCannotDelete": "無法刪除分類，該分類正被交易記錄使用中"
 }

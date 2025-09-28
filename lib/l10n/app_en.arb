@@ -617,5 +617,9 @@
   "categoryNameAlreadyExists": "A category with this name already exists",
   "@@categoryNameAlreadyExists": {
     "description": "Error message when category name already exists"
+  },
+  "categoryInUseCannotDelete": "Cannot delete category as it is being used by transactions",
+  "@@categoryInUseCannotDelete": {
+    "description": "Error message when trying to delete a category that is in use"
   }
 }

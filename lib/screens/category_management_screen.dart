@@ -87,8 +87,15 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen>
         }
       } catch (e) {
         if (mounted) {
+          String errorMessage;
+          if (e.toString().contains('FOREIGN KEY constraint failed') ||
+              e.toString().contains('foreign key constraint')) {
+            errorMessage = AppLocalizations.of(context)!.categoryInUseCannotDelete;
+          } else {
+            errorMessage = AppLocalizations.of(context)!.errorsEncountered;
+          }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.failedToDeleteCategoryError(e.toString()))),
+            SnackBar(content: Text(errorMessage)),
           );
         }
       }

@@ -962,6 +962,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A category with this name already exists'**
   String get categoryNameAlreadyExists;
+
+  /// No description provided for @categoryInUseCannotDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot delete category as it is being used by transactions'**
+  String get categoryInUseCannotDelete;
 }
 
 class _AppLocalizationsDelegate

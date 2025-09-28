@@ -469,6 +469,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get categoryNameAlreadyExists => '此分類名稱已存在';
+
+  @override
+  String get categoryInUseCannotDelete => '無法刪除分類，該分類正被交易記錄使用中';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -936,4 +939,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get categoryNameAlreadyExists => '此分類名稱已存在';
+
+  @override
+  String get categoryInUseCannotDelete => '無法刪除分類，該分類正被交易記錄使用中';
 }
