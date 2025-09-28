@@ -171,7 +171,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.selectIcon),
-        content: Container(
+        content: SizedBox(
           width: double.maxFinite,
           height: 300,
           child: GridView.builder(
@@ -217,7 +217,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.selectColor),
-        content: Container(
+        content: SizedBox(
           width: double.maxFinite,
           height: 200,
           child: GridView.builder(
